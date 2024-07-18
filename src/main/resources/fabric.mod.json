@@ -16,10 +16,10 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.jship.BasicFluidHopper.BasicFluidHopper"
+			"com.jship.basicfluidhopper.BasicFluidHopper"
 		],
 		"client": [
-			"com.jship.BasicFluidHopper.BasicFluidHopperClient"
+			"com.jship.basicfluidhopper.client.BasicFluidHopperClient"
 		]
 	},
 	"accessWidener": "basic_fluid_hopper.accesswidener",
