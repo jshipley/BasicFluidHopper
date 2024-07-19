@@ -50,6 +50,7 @@ public class BasicFluidHopper implements ModInitializer {
         public static final Block HONEY_SOURCE_BLOCK;
         public static final Item HONEY_BUCKET;
         public static final TagKey<Fluid> C_HONEY;
+        public static final TagKey<Fluid> C_FLUID_FUEL;
 
     static {
         LOGGER = LoggerFactory.getLogger("Basic Fluid Hopper");
@@ -100,6 +101,9 @@ public class BasicFluidHopper implements ModInitializer {
         HONEY_BUCKET = Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "honey_bucket"),
                 new BucketItem(HONEY, new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
         C_HONEY = TagKey.create(Registries.FLUID, ResourceLocation.fromNamespaceAndPath("c", "honey"));
+
+        // Any fluid in tags/c/fluid/fuel will be usable in a furnace and will have the same burn duration as lava
+        C_FLUID_FUEL = TagKey.create(Registries.FLUID, ResourceLocation.fromNamespaceAndPath("c", "fuel"));
     }
 
         @Override

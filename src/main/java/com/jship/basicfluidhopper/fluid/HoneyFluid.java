@@ -84,6 +84,7 @@ public abstract class HoneyFluid extends FlowingFluid {
 		return false;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void spreadTo(LevelAccessor level, BlockPos pos, BlockState blockState, Direction direction, FluidState fluidState) {
 		// from lava
@@ -117,6 +118,7 @@ public abstract class HoneyFluid extends FlowingFluid {
 		return BasicFluidHopper.HONEY_SOURCE_BLOCK.defaultBlockState().setValue(LiquidBlock.LEVEL, Integer.valueOf(getLegacyLevel(state)));
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean isSame(Fluid fluid) {
 		// TODO Use TagKey to say it's the same fluid if it's c/fluid/honey or c/fluid/visual/honey

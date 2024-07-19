@@ -110,6 +110,22 @@ public class BasicFluidHopperBlockEntity extends BlockEntity {
         return fluidStorage.getAmount() == 0;
     }
 
+    // Decrease the stored fluid
+    // Could be used when fluid is used as furnace fuel or used to fill bottles
+    public static boolean extract(BasicFluidHopperBlockEntity blockEntity, int amount) {
+        if (blockEntity.fluidStorage.isResourceBlank()) {
+            return false;
+        }
+        try (Transaction tx = Transaction.openOuter()) {
+            long extracted = blockEntity.fluidStorage.extract(blockEntity.fluidStorage.getResource(), amount, tx);
+            if (extracted == amount) {
+                tx.commit();
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static boolean insert(Level level, BlockPos pos, BasicFluidHopperBlockEntity blockEntity) {
         SingleFluidStorage inputFluidStorage = blockEntity.fluidStorage;
         Storage<FluidVariant> outputFluidStorage = BasicFluidHopperBlockEntity.getOutputFluidStorage(level, pos,
@@ -128,6 +144,10 @@ public class BasicFluidHopperBlockEntity extends BlockEntity {
             }
         }
         return false;
+    }
+
+    public boolean isFacing(Direction direction) {
+        return direction == facing;
     }
 
     public static boolean extract(Level level, BlockPos pos, BasicFluidHopperBlockEntity blockEntity) {
