@@ -12,7 +12,6 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
@@ -25,9 +24,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AbstractFurnaceBlockEntity.class)
 public abstract class AbstractFurnaceMixin {
-    // Trying DROPLET (1) for a continuous burn. Consider using NUGGET (BUCKET / 81)
-    // instead if DROPLET doesn't feel right.
-    private static final int FUEL_CONSUME_STEP = (int) FluidConstants.DROPLET;
+    // FluidConstants.DROPLET breaks blast furnaces (1/2 == 0) and FluidConstants.NUGGET feels too long
+    // Since the default is to cook one item in 200 ticks, just use 200. It feels like a nice trade-off
+    // between a continuous burn and wasting a lot of lava every time you start cooking.
+    private static final int FUEL_CONSUME_STEP = 200;
 
     @Inject(at = @At("HEAD"), method = "getBurnDuration(Lnet/minecraft/world/item/ItemStack;)I", cancellable = true)
     private void getFluidBurnDuration(ItemStack fuel, CallbackInfoReturnable<Integer> cir) {
