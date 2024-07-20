@@ -9,7 +9,10 @@ import com.jship.basicfluidhopper.vehicle.BasicFluidHopperMinecartItem;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.core.dispenser.BlockSource;
+import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -19,10 +22,14 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.DispensibleContainerItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -37,6 +44,10 @@ import org.slf4j.LoggerFactory;
 
 public class BasicFluidHopper implements ModInitializer {
         public static final String MOD_ID = "basic_fluid_hopper";
+
+        // Don't use FluidConstants.DROPLET. it breaks blast furnaces and smokers (1/2 == 0)
+        // 200 seems about right, it should be enough to smelt/cook a single item for most recipes
+        public static final int FUEL_CONSUME_STEP = 200;
 
         public static final Logger LOGGER;
         public static final Block BASIC_FLUID_HOPPER_BLOCK;

@@ -17,6 +17,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -112,7 +115,7 @@ public class BasicFluidHopperBlockEntity extends BlockEntity {
 
     // Decrease the stored fluid
     // Could be used when fluid is used as furnace fuel or used to fill bottles
-    public static boolean extract(BasicFluidHopperBlockEntity blockEntity, int amount) {
+    public static boolean extract(BasicFluidHopperBlockEntity blockEntity, long amount) {
         if (blockEntity.fluidStorage.isResourceBlank()) {
             return false;
         }
@@ -358,4 +361,15 @@ public class BasicFluidHopperBlockEntity extends BlockEntity {
         // the hopper, capped at 15.
         return Math.max(15, (int) (fluidStorage.getAmount() / fluidStorage.getCapacity()) * BUCKET_CAPACITY * 4);
     }
+
+    @Nullable
+  @Override
+  public Packet<ClientGamePacketListener> getUpdatePacket() {
+    return ClientboundBlockEntityDataPacket.create(this);
+  }
+ 
+  @Override
+  public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+    return saveWithoutMetadata(registries);
+  }
 }
