@@ -80,7 +80,7 @@ public abstract class HoneyFluid extends FlowingFluid {
 	}
 
 	@Override
-	protected boolean canConvertToSource(Level level) {
+	protected boolean canConvertToSource() {
 		return false;
 	}
 

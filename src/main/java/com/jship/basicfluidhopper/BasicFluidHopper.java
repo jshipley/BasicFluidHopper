@@ -8,14 +8,11 @@ import com.jship.basicfluidhopper.vehicle.BasicFluidHopperMinecartItem;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityDimensions;
@@ -23,7 +20,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
-import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
@@ -34,7 +31,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 
 import org.slf4j.Logger;
@@ -67,15 +63,15 @@ public class BasicFluidHopper implements ModInitializer {
                 LOGGER = LoggerFactory.getLogger("Basic Fluid Hopper");
 
                 BASIC_FLUID_HOPPER_BLOCK = Registry.register(
-                                BuiltInRegistries.BLOCK,
+                                Registry.BLOCK,
                                 new ResourceLocation(MOD_ID, "basic_fluid_hopper"),
                                 new BasicFluidHopperBlock(FabricBlockSettings.copyOf(Blocks.HOPPER)));
                 BASIC_FLUID_HOPPER_ITEM = Registry.register(
-                                BuiltInRegistries.ITEM,
+                                Registry.ITEM,
                                 new ResourceLocation(MOD_ID, "basic_fluid_hopper"),
-                                new BlockItem(BASIC_FLUID_HOPPER_BLOCK, new FabricItemSettings()));
+                                new BlockItem(BASIC_FLUID_HOPPER_BLOCK, new FabricItemSettings().group(CreativeModeTab.TAB_DECORATIONS)));
                 BASIC_FLUID_HOPPER_BLOCK_ENTITY = Registry.register(
-                                BuiltInRegistries.BLOCK_ENTITY_TYPE,
+                                Registry.BLOCK_ENTITY_TYPE,
                                 new ResourceLocation(MOD_ID, "basic_fluid_hopper"),
                                 FabricBlockEntityTypeBuilder
                                                 .create(BasicFluidHopperBlockEntity::new, BASIC_FLUID_HOPPER_BLOCK)
@@ -84,11 +80,11 @@ public class BasicFluidHopper implements ModInitializer {
                                 BASIC_FLUID_HOPPER_BLOCK_ENTITY);
 
                 BASIC_FLUID_HOPPER_MINECART_ITEM = Registry.register(
-                                BuiltInRegistries.ITEM,
+                                Registry.ITEM,
                                 new ResourceLocation(MOD_ID, "basic_fluid_hopper_minecart"),
-                                new BasicFluidHopperMinecartItem(new Item.Properties().stacksTo(1)));
+                                new BasicFluidHopperMinecartItem(new FabricItemSettings().stacksTo(1)));
                 BASIC_FLUID_HOPPER_MINECART_ENTITY = Registry.register(
-                                BuiltInRegistries.ENTITY_TYPE,
+                                Registry.ENTITY_TYPE,
                                 new ResourceLocation(MOD_ID, "basic_fluid_hopper_minecart"),
                                 FabricEntityTypeBuilder
                                                 .<BasicFluidHopperMinecartEntity>create(MobCategory.MISC,
@@ -98,37 +94,25 @@ public class BasicFluidHopper implements ModInitializer {
                 // FluidStorage.SIDED.registerForBlockEntity((tank, direction) ->
                 // tank.fluidStorage, BASIC_FLUID_HOPPER_BLOCK_ENTITY);
 
-                HONEY = Registry.register(BuiltInRegistries.FLUID, new ResourceLocation(MOD_ID, "honey"),
+                HONEY = Registry.register(Registry.FLUID, new ResourceLocation(MOD_ID, "honey"),
                                 new HoneyFluid.Source());
-                FLOWING_HONEY = Registry.register(BuiltInRegistries.FLUID,
+                FLOWING_HONEY = Registry.register(Registry.FLUID,
                                 new ResourceLocation(MOD_ID, "flowing_honey"), new HoneyFluid.Flowing());
-                HONEY_SOURCE_BLOCK = Registry.register(BuiltInRegistries.BLOCK, new ResourceLocation(MOD_ID, "honey"),
-                                new LiquidBlock(HONEY, BlockBehaviour.Properties.of()
-                                                .mapColor(MapColor.COLOR_YELLOW)
-                                                .replaceable()
-                                                .noCollission()
-                                                .strength(100.0F)
-                                                .pushReaction(PushReaction.DESTROY)
+                HONEY_SOURCE_BLOCK = Registry.register(Registry.BLOCK, new ResourceLocation(MOD_ID, "honey"),
+                                new LiquidBlock(HONEY, FabricBlockSettings.copyOf(Blocks.WATER)
                                                 .speedFactor(0.2F)
                                                 .jumpFactor(0.3F)
-                                                .noLootTable()
-                                                .liquid()
                                                 .sound(SoundType.HONEY_BLOCK)));
-                HONEY_BUCKET = Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(MOD_ID, "honey_bucket"),
-                                new BucketItem(HONEY, new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
-                C_HONEY = TagKey.create(Registries.FLUID, new ResourceLocation("c", "honey"));
+                HONEY_BUCKET = Registry.register(Registry.ITEM, new ResourceLocation(MOD_ID, "honey_bucket"),
+                                new BucketItem(HONEY, new FabricItemSettings().craftRemainder(Items.BUCKET).stacksTo(1)));
+                C_HONEY = TagKey.create(Registry.FLUID_REGISTRY, new ResourceLocation("c", "honey"));
 
                 // Any fluid in tags/c/fluid/fuel will be usable in a furnace and will have the
                 // same burn duration as lava
-                C_FLUID_FUEL = TagKey.create(Registries.FLUID, new ResourceLocation("c", "fuel"));
+                C_FLUID_FUEL = TagKey.create(Registry.FLUID_REGISTRY, new ResourceLocation("c", "fuel"));
         }
 
         @Override
         public void onInitialize() {
-                ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(content -> {
-                        content.addAfter(Items.HOPPER, BASIC_FLUID_HOPPER_BLOCK);
-                        content.addAfter(Items.HOPPER_MINECART, BASIC_FLUID_HOPPER_MINECART_ITEM);
-                        content.addAfter(Items.LAVA_BUCKET, HONEY_BUCKET);
-                });
         }
 }

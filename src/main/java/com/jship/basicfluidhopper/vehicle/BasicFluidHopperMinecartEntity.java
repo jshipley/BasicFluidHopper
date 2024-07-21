@@ -77,13 +77,13 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart {
 	@Override
 	public void tick() {
 		super.tick();
-		if (!this.level().isClientSide && this.isAlive() && this.isEnabled() && this.canOperate()) {
+		if (!this.getLevel().isClientSide && this.isAlive() && this.isEnabled() && this.canOperate()) {
 			this.setChanged();
 		}
 	}
 
 	public boolean canOperate() {
-		return BasicFluidHopperBlockEntity.extract(this.level(), this);
+		return BasicFluidHopperBlockEntity.extract(this.getLevel(), this);
 	}
 
 	@Override
