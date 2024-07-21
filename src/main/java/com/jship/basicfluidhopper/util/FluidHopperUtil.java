@@ -8,13 +8,13 @@ import com.jship.basicfluidhopper.block.BasicFluidHopperBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.dispenser.BlockSource;
+import net.minecraft.core.BlockSource;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -52,13 +52,13 @@ public class FluidHopperUtil {
                     && hopperEntity.fluidStorage.getAmount() >= BasicFluidHopper.FUEL_CONSUME_STEP) {
                 // Enough fuel to power a furnace for a bit longer was found in this hopper
                 return hopperEntity;
-            } else if (item.is(Items.GLASS_BOTTLE)
+            } else if (item != null && item.is(Items.GLASS_BOTTLE)
                     && hopperEntity.fluidStorage.getAmount() >= FluidConstants.BOTTLE
                     && (hopperFluid.isSame(Fluids.WATER) || hopperFluid.is(BasicFluidHopper.C_HONEY))) {
                 // Enough fluid that can go in a bottle was found in this hopper
                 // TODO support other mods that add additional bottled fluids
                 return hopperEntity;
-            } else if (item.is(Items.BUCKET)
+            } else if (item != null && item.is(Items.BUCKET)
                     && hopperFluid.getBucket() != null
                     && hopperEntity.fluidStorage.getAmount() >= FluidConstants.BUCKET) {
                 // Enough fluid that can go in a bucket was found in this hopper
@@ -71,15 +71,15 @@ public class FluidHopperUtil {
 
     @SuppressWarnings("deprecation")
     public static ItemStack fillDispenserItemFromHopper(ItemStack emptyItem, BlockSource dispenser) {
-        ServerLevel level = dispenser.level();
-        BlockPos pos = dispenser.pos();
+        ServerLevel level = dispenser.getLevel();
+        BlockPos pos = dispenser.getPos();
         if (emptyItem.is(Items.GLASS_BOTTLE)) {
             BasicFluidHopperBlockEntity fluidHopper = FluidHopperUtil.getHopperInsertingFluid(level, pos, level.getBlockState(pos), level.getBlockEntity(pos), false, emptyItem);
             if (fluidHopper == null) {
                 return new ItemStack(Items.AIR);
             }
             if (fluidHopper.fluidStorage.getResource().isOf(Fluids.WATER) && BasicFluidHopperBlockEntity.extract(fluidHopper, FluidConstants.BOTTLE)) {
-                return PotionContents.createItemStack(Items.POTION, Potions.WATER);
+                return PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER);
             } else if (fluidHopper.fluidStorage.getResource().getFluid().is(BasicFluidHopper.C_HONEY) && BasicFluidHopperBlockEntity.extract(fluidHopper, FluidConstants.BOTTLE)) {
                 return new ItemStack(Items.HONEY_BOTTLE);
             }            

@@ -23,8 +23,8 @@ public class BasicFluidHopperClient implements ClientModInitializer {
                 context -> new MinecartRenderer<>(context, ModelLayers.HOPPER_MINECART));
         FluidRenderHandlerRegistry.INSTANCE.register(BasicFluidHopper.HONEY, BasicFluidHopper.FLOWING_HONEY,
                 new SimpleFluidRenderHandler(
-                        ResourceLocation.fromNamespaceAndPath(BasicFluidHopper.MOD_ID, "block/honey_still"),
-                        ResourceLocation.fromNamespaceAndPath(BasicFluidHopper.MOD_ID, "block/honey_flow"),
+                        new ResourceLocation(BasicFluidHopper.MOD_ID, "block/honey_still"),
+                        new ResourceLocation(BasicFluidHopper.MOD_ID, "block/honey_flow"),
                         SimpleFluidRenderHandler.WATER_OVERLAY,
                         0xCCFED167));
         BlockRenderLayerMap.INSTANCE.putFluids(RenderType.translucent(),

@@ -10,16 +10,11 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -57,16 +52,18 @@ public class BasicFluidHopperBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        SingleVariantStorage.readNbt(fluidStorage, FluidVariant.CODEC, FluidVariant::blank, nbt, registryLookup);
+    public void load(CompoundTag nbt) {
+        super.load(nbt);
+        FluidVariant.fromNbt(nbt.getCompound("variant"));
+        this.fluidStorage.amount = nbt.getLong("amount");
         this.transferCooldown = nbt.getInt("TransferCooldown");
     }
 
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        SingleVariantStorage.writeNbt(fluidStorage, FluidVariant.CODEC, nbt, registryLookup);
+    protected void saveAdditional(CompoundTag nbt) {
+        super.saveAdditional(nbt);
+        nbt.put("variant", fluidStorage.variant.toNbt());
+        nbt.putLong("amount", fluidStorage.getAmount());
         nbt.putInt("TransferCooldown", this.transferCooldown);
     }
 
@@ -219,7 +216,7 @@ public class BasicFluidHopperBlockEntity extends BlockEntity {
                 long inserted = outputFluidStorage.insert(FluidVariant.of(aboveFluidState.getType()),
                         FluidConstants.BUCKET, tx);
                 if (inserted == FluidConstants.BUCKET) {
-                    ItemStack bucket = aboveBlock.pickupBlock(null, level, pos.above(), aboveBlockState);
+                    ItemStack bucket = aboveBlock.pickupBlock(level, pos.above(), aboveBlockState);
                     if (!bucket.isEmpty()) {
                         tx.commit();
                         return true;
@@ -361,15 +358,4 @@ public class BasicFluidHopperBlockEntity extends BlockEntity {
         // the hopper, capped at 15.
         return Math.max(15, (int) (fluidStorage.getAmount() / fluidStorage.getCapacity()) * BUCKET_CAPACITY * 4);
     }
-
-    @Nullable
-  @Override
-  public Packet<ClientGamePacketListener> getUpdatePacket() {
-    return ClientboundBlockEntityDataPacket.create(this);
-  }
- 
-  @Override
-  public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-    return saveWithoutMetadata(registries);
-  }
 }

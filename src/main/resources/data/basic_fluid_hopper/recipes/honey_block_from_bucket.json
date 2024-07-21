@@ -6,6 +6,6 @@
         }
     ],
     "result": {
-        "id": "minecraft:honey_block"
+        "item": "minecraft:honey_block"
     }
 }

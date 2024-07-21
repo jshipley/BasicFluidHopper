@@ -2,13 +2,11 @@ package com.jship.basicfluidhopper.vehicle;
 
 import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.block.BasicFluidHopperBlockEntity;
-import com.mojang.serialization.DataResult;
 
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -118,8 +116,7 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart {
 	protected void addAdditionalSaveData(CompoundTag nbt) {
 		super.addAdditionalSaveData(nbt);
 		nbt.putBoolean("enabled", this.enabled);
-		nbt.put("variant", FluidVariant.CODEC.encode(fluidStorage.variant, NbtOps.INSTANCE, nbt)
-				.getOrThrow(RuntimeException::new));
+		nbt.put("variant", fluidStorage.variant.toNbt());
 		nbt.putLong("amount", fluidStorage.amount);
 	}
 
@@ -127,8 +124,7 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart {
 	protected void readAdditionalSaveData(CompoundTag nbt) {
 		super.readAdditionalSaveData(nbt);
 		this.enabled = nbt.contains("enabled") ? nbt.getBoolean("enabled") : true;
-		DataResult<FluidVariant> result = FluidVariant.CODEC.parse(NbtOps.INSTANCE, nbt.getCompound("variant"));
-		fluidStorage.variant = result.error().isPresent() ? FluidVariant.blank() : result.result().get();
+		fluidStorage.variant = FluidVariant.fromNbt(nbt.getCompound("variant"));
 		fluidStorage.amount = nbt.getLong("amount");
 	}
 }
