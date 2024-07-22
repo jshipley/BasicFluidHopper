@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "basic_fluid_hopper",
+  "version": "${version}",
+  "name": "Basic Fluid Hopper",
+  "description": "This is an example description! Tell everyone what your mod is about!",
+  "authors": [
+    "Me!"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/FabricMC/fabric-example-mod"
+  },
+  "license": "CC0-1.0",
+  "icon": "assets/basic_fluid_hopper/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.jship.basicfluidhopper.fabric.ExampleModFabric"
+    ],
+    "client": [
+      "com.jship.basicfluidhopper.fabric.client.ExampleModFabricClient"
+    ]
+  },
+  "mixins": [
+    "basic_fluid_hopper.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21",
+    "java": ">=21",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}

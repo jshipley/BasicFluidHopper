@@ -1,0 +1,19 @@
+architectury {
+    common rootProject.enabled_platforms.split(',')
+}
+
+dependencies {
+    // We depend on Fabric Loader here to use the Fabric @Environment annotations,
+    // which get remapped to the correct annotations on each platform.
+    // Do NOT use other classes from Fabric Loader.
+    modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
+
+    modImplementation("earth.terrarium.common_storage_lib:common-storage-lib-common-1.21:${rootProject.csl_version}")
+    modImplementation("earth.terrarium.common_storage_lib:common-storage-lib-data-common-1.21:${rootProject.csl_version}")
+    modImplementation("earth.terrarium.common_storage_lib:common-storage-lib-lookup-common-1.21:${rootProject.csl_version}")
+    modImplementation("earth.terrarium.common_storage_lib:common-storage-lib-resources-common-1.21:${rootProject.csl_version}")
+}
+
+loom {
+    accessWidenerPath = file("src/main/resources/basic_fluid_hopper.accesswidener")
+}
