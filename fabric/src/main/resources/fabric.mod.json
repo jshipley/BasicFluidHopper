@@ -16,10 +16,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.jship.basicfluidhopper.fabric.ExampleModFabric"
+      "com.jship.basicfluidhopper.fabric.BasicFluidHopperFabric"
     ],
     "client": [
-      "com.jship.basicfluidhopper.fabric.client.ExampleModFabricClient"
+      "com.jship.basicfluidhopper.fabric.client.BasicFluidHopperFabricClient"
     ]
   },
   "mixins": [

@@ -20,6 +20,7 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
@@ -55,14 +56,14 @@ public class BasicFluidHopperBlockEntity extends BlockEntity implements FluidPro
     @Override
     protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         super.loadAdditional(nbt, registryLookup);
-        // SingleVariantStorage.readNbt(fluidStorage, FluidVariant.CODEC, FluidVariant::blank, nbt, registryLookup);
+        // fluidStorage should be managed by FLUID_CONTENTS data manager
         this.transferCooldown = nbt.getInt("TransferCooldown");
     }
 
     @Override
     protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         super.saveAdditional(nbt, registryLookup);
-        // SingleVariantStorage.writeNbt(fluidStorage, FluidVariant.CODEC, nbt, registryLookup);
+        // fluidStorage should be managed by FLUID_CONTENTS data manager
         nbt.putInt("TransferCooldown", this.transferCooldown);
     }
 
@@ -254,22 +255,19 @@ public class BasicFluidHopperBlockEntity extends BlockEntity implements FluidPro
     // TODO use FluidAPI and Lookup to find the fluid from a bucket
     public static boolean tryDrainBucket(ItemStack item, Level level, BlockPos pos, Player player, InteractionHand hand,
         SimpleFluidStorage fluidStorage) {
-        FluidResource resource;
-        if (item.is(Items.WATER_BUCKET)) {
-            resource = FluidResource.of(Fluids.WATER);
-        } else if (item.is(Items.LAVA_BUCKET)) {
-            resource = FluidResource.of(Fluids.LAVA);
-        } else if (item.is(BasicFluidHopper.HONEY_BUCKET.get())) {
-            resource = FluidResource.of(BasicFluidHopper.HONEY.get());
-        } else {
+        if (!(item.getItem() instanceof BucketItem)) {
             return false;
         }
-
+        FluidResource resource = FluidResource.of(((BucketItem) item.getItem()).content);
+        if (resource.isBlank()) {
+            return false;
+        }
         long inserted = fluidStorage.insert(resource, FluidAmounts.BUCKET, true);
         if (inserted != FluidAmounts.BUCKET) {
             return false;
         }
 
+        // TODO do the right thing for creative mode (infinite inventory)
         player.setItemInHand(hand, ItemUtils.createFilledResult(item, player, new ItemStack(Items.BUCKET)));
         player.awardStat(Stats.ITEM_USED.get(item.getItem()));
         SoundEvent bucketEmpty;
@@ -336,6 +334,7 @@ public class BasicFluidHopperBlockEntity extends BlockEntity implements FluidPro
 
     @Override
     public CommonStorage<FluidResource> getFluids(@Nullable Direction direction) {
-        return direction != null && isFacing(direction) ? fluidStorage : null;
+        // Fluid can be pulled from any direction.
+        return fluidStorage;
     }
 }

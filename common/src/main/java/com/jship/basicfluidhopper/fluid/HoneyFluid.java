@@ -122,7 +122,7 @@ public abstract class HoneyFluid extends FlowingFluid {
 	@Override
 	public boolean isSame(Fluid fluid) {
 		// TODO Use TagKey to say it's the same fluid if it's c/fluid/honey or c/fluid/visual/honey
-		return fluid.is(BasicFluidHopper.C_HONEY);// == BasicFluidHopper.HONEY || fluid == BasicFluidHopper.FLOWING_HONEY;
+		return fluid.is(BasicFluidHopper.C_HONEY);
 	}
 
 	@Override

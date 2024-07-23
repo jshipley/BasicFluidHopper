@@ -114,17 +114,11 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart {
 	protected void addAdditionalSaveData(CompoundTag nbt) {
 		super.addAdditionalSaveData(nbt);
 		nbt.putBoolean("enabled", this.enabled);
-		// nbt.put("variant", FluidVariant.CODEC.encode(fluidStorage.variant, NbtOps.INSTANCE, nbt)
-		// 		.getOrThrow(RuntimeException::new));
-		// nbt.putLong("amount", fluidStorage.amount);
 	}
 
 	@Override
 	protected void readAdditionalSaveData(CompoundTag nbt) {
 		super.readAdditionalSaveData(nbt);
 		this.enabled = nbt.contains("enabled") ? nbt.getBoolean("enabled") : true;
-		// DataResult<FluidVariant> result = FluidVariant.CODEC.parse(NbtOps.INSTANCE, nbt.getCompound("variant"));
-		// fluidStorage.variant = result.error().isPresent() ? FluidVariant.blank() : result.result().get();
-		// fluidStorage.amount = nbt.getLong("amount");
 	}
 }

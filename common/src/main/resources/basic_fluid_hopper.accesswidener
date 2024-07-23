@@ -1,3 +1,4 @@
 accessWidener   v2  named
 
 extendable    method    net/minecraft/world/entity/vehicle/VehicleEntity    getDropItem    ()Lnet/minecraft/world/item/Item;
+accessible    field     net/minecraft/world/item/BucketItem                 content        Lnet/minecraft/world/level/material/Fluid;
