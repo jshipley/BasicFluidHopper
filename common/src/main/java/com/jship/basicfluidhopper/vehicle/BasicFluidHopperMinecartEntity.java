@@ -1,10 +1,11 @@
 package com.jship.basicfluidhopper.vehicle;
 
 import com.jship.basicfluidhopper.BasicFluidHopper;
-import com.jship.basicfluidhopper.block.BasicFluidHopperBlockEntity;
+import com.jship.basicfluidhopper.fluid.FluidHopper;
 import com.jship.basicfluidhopper.fluid.HopperFluidStorage;
 
 import dev.architectury.fluid.FluidStack;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -19,10 +20,9 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.Level;
 
-public class BasicFluidHopperMinecartEntity extends AbstractMinecart {
+public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements FluidHopper {
 	private boolean enabled = true;
-	public static final int TRANSFER_COOLDOWN = 8;
-	public static final int BUCKET_CAPACITY = 1;
+	private int transferCooldown = -1;
 	public final HopperFluidStorage fluidStorage;
 
 	public BasicFluidHopperMinecartEntity(EntityType<?> entityType, Level level) {
@@ -71,6 +71,7 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart {
 		}
 	}
 
+	@Override
 	public boolean isEnabled() {
 		return this.enabled;
 	}
@@ -89,22 +90,23 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart {
 	}
 
 	public boolean canOperate() {
-		return BasicFluidHopperBlockEntity.extract(this.level(), this);
+		return FluidHopper.drain(this.level(), this.getOnPos().above(2), this);
 	}
 
 	@Override
 	public InteractionResult interact(Player player, InteractionHand hand) {
-		// ItemStack item = player.getItemInHand(hand);
-		// if (item.is(Items.BUCKET)) {
-		// 	return BasicFluidHopperBlockEntity.tryFillBucket(item, getCommandSenderWorld(), blockPosition(), player, hand,
-		// 			fluidStorage) ? InteractionResult.CONSUME : InteractionResult.SUCCESS;
-		// } else if (item.getItem() instanceof BucketItem) {
-		// 	return BasicFluidHopperBlockEntity.tryDrainBucket(item, getCommandSenderWorld(), blockPosition(), player, hand,
-		// 			fluidStorage) ? InteractionResult.CONSUME : InteractionResult.SUCCESS;
-		// }
+		ItemStack item = player.getItemInHand(hand);
+		if (item.is(Items.BUCKET)) {
+			return FluidHopper.tryFillBucket(item, getCommandSenderWorld(), blockPosition(), player, hand,
+					fluidStorage) ? InteractionResult.CONSUME : InteractionResult.SUCCESS;
+		} else if (item.getItem() instanceof BucketItem) {
+			return FluidHopper.tryDrainBucket(item, getCommandSenderWorld(), blockPosition(), player, hand,
+					fluidStorage) ? InteractionResult.CONSUME : InteractionResult.SUCCESS;
+		}
 		return InteractionResult.SUCCESS;
 	}
 
+	@Override
 	public void setChanged() {
 	}
 
@@ -128,5 +130,21 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart {
 	protected void readAdditionalSaveData(CompoundTag nbt) {
 		super.readAdditionalSaveData(nbt);
 		this.enabled = nbt.contains("enabled") ? nbt.getBoolean("enabled") : true;
+	}
+
+	@Override
+	public void setTransferCooldown(int transferCooldown) {
+		this.transferCooldown = transferCooldown;
+	}
+
+	@Override
+	public boolean needsCooldown() {
+		return transferCooldown > 0;
+	}
+
+	@Override
+	public Direction getFacing() {
+		// Only relevant if the fill methods are called, but they shouldn't be for a hopper minecart.
+		return Direction.DOWN;
 	}
 }

@@ -2,6 +2,7 @@
     "block.basic_fluid_hopper.basic_fluid_hopper": "Fluid Hopper",
     "item.basic_fluid_hopper.basic_fluid_hopper": "Fluid Hopper",
     "block.basic_fluid_hopper.honey": "Honey",
+    "fluid.basic_fluid_hopper.honey": "Honey",
     "item.basic_fluid_hopper.honey_bucket": "Honey Bucket",
     "entity.basic_fluid_hopper.basic_fluid_hopper_minecart": "Minecart with Fluid Hopper",
     "item.basic_fluid_hopper.basic_fluid_hopper_minecart": "Minecart with Fluid Hopper",

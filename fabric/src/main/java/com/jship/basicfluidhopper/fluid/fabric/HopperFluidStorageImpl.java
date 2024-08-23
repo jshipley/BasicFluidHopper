@@ -1,4 +1,4 @@
-package com.jship.basicfluidhopper.fabric.fluid;
+package com.jship.basicfluidhopper.fluid.fabric;
 
 import java.util.Optional;
 
@@ -16,8 +16,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.vehicle.VehicleEntity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 
 public class HopperFluidStorageImpl extends HopperFluidStorage {
     private final long maxAmount;
@@ -84,27 +82,60 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
                     }
                 }
             }
-            if (drained > 0 && !simulate) {
-                tx.commit();
-            }
+            if (drained > 0 && !simulate) tx.commit();
         }
         return drained;
     }
 
     @Override
     public long fillBlockPos(Level level, BlockPos pos, Direction facing, boolean simulate) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'fillBlockPos'");
+        if (isEmpty()) return 0;
+        Storage<FluidVariant> sourceStorage = FluidStorage.SIDED.find(level, pos, facing.getOpposite());
+        if (sourceStorage == null) return 0;
+        return fillFluidStorage(sourceStorage, simulate);
     }
 
     @Override
     public long fillVehicle(Level level, VehicleEntity vehicle, boolean simulate) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'fillVehicle'");
+        // given the lack of an fluid api for entities, only care about vehicles from this mod for now.
+        if (vehicle instanceof BasicFluidHopperMinecartEntity hopperEntity)
+            return fillFluidStorage(((HopperFluidStorageImpl)hopperEntity.getFluidStorage()).fluidStorage, simulate);
+        return 0;
     }
 
-    public long fillFluidStorage(Storage<FluidVariant> dest, boolean simulate) {
-        throw new UnsupportedOperationException("Unimplemented method 'fillFluidStorage'");
+    public long fillFluidStorage(Storage<FluidVariant> destStorage, boolean simulate) {
+        long filled = 0;
+        try (Transaction tx = Transaction.openOuter()) {
+            FluidVariant resource = fluidStorage.getResource();
+            long maxInsert = Math.min(this.transferRate, fluidStorage.getCapacity());
+            long inserted = destStorage.insert(resource, maxInsert, tx);
+            long extracted = fluidStorage.extract(resource, inserted, tx);
+            if (inserted == extracted) filled = inserted;
+            if (filled > 0 && !simulate) tx.commit();
+        }
+        return filled;
+    }
+
+    public long add(FluidStack fluid, long amount, boolean simulate) {
+        if (isFull()) return 0;
+        long added = 0;
+        try (Transaction tx = Transaction.openOuter()) {
+            long inserted = fluidStorage.insert(FluidStackHooksFabric.toFabric(fluid), amount, tx);
+            if (inserted == amount) added = inserted;
+            if (added > 0 && !simulate) tx.commit();
+        }
+        return added;
+    }
+
+    public long remove(long amount, boolean simulate) {
+        if (isEmpty()) return 0;
+        long removed = 0;
+        try (Transaction tx = Transaction.openOuter()) {
+            long extracted = fluidStorage.extract(fluidStorage.getResource(), amount, tx);
+            if (extracted == amount) removed = extracted;
+            if (removed > 0 && !simulate) tx.commit();
+        }
+        return removed;
     }
 
     @Override
@@ -203,5 +234,9 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
     @Override
     public long getMaxAmount() {
         return fluidStorage.getCapacity();
+    }
+
+    public Storage<FluidVariant> getFluidStorage() {
+        return fluidStorage;
     }
 }    

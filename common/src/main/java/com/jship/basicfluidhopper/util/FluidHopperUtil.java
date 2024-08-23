@@ -34,14 +34,14 @@ public class FluidHopperUtil {
             BasicFluidHopperBlockEntity hopperEntity;
 
             // Look for a fluid hopper that is facing blockEntity and is not empty
-            if (level != null && !level.isClientSide()
-                    && level.getBlockEntity(pos.relative(direction)) instanceof BasicFluidHopperBlockEntity ent
-                    && ent.isFacing(direction.getOpposite())
-                    && !ent.isEmpty()) {
-                hopperEntity = ent;
-            } else {
-                continue;
-            }
+            // if (level != null && !level.isClientSide()
+            //         && level.getBlockEntity(pos.relative(direction)) instanceof BasicFluidHopperBlockEntity ent
+            //         && ent.facing == direction.getOpposite()
+            //         && !ent.fluidStorage.isEmpty()) {
+            //     hopperEntity = ent;
+            // } else {
+            //     continue;
+            // }
 
             // FluidResource hopperFluid = hopperEntity.fluidStorage.getResource(0);
             // if (item == null && burnable

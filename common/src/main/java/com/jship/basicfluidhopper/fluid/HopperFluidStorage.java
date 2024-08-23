@@ -63,6 +63,23 @@ public abstract class HopperFluidStorage {
     public abstract long fillVehicle(Level level, VehicleEntity vehicle, boolean simulate);
 
     /**
+     * Try to add fluid to the storage container
+     * @param fluid the type of fluid to add
+     * @param amount the amount of fluid to add
+     * @param simulate if true, only simulate the changes without updating anything
+     * @return the amount of fluid that was added (or would be added)
+     */
+    public abstract long add(FluidStack fluid, long amount, boolean simulate);
+
+    /**
+     * Remove fluid from the storage container
+     * @param amount the amount of fluid to remove
+     * @param simulate if true, only simulate the changes without updating anything
+     * @return the amount of fluid that was removed
+     */
+    public abstract long remove(long amount, boolean simulate);
+
+    /**
      * Get the FluidStack from the fluid storage. Useful for saving the fluid NBT
      * @return a FluidStack, if it's not empty
      */

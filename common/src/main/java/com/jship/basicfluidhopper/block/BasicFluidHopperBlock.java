@@ -1,7 +1,7 @@
 package com.jship.basicfluidhopper.block;
 
 import com.jship.basicfluidhopper.BasicFluidHopper;
-
+import com.jship.basicfluidhopper.fluid.FluidHopper;
 import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
@@ -151,20 +151,20 @@ public class BasicFluidHopperBlock extends BaseEntityBlock {
 		if (level.isClientSide) {
 			return ItemInteractionResult.SUCCESS;
 		} else {
-			// BlockEntity blockEntity = level.getBlockEntity(pos);
-			// if (blockEntity instanceof BasicFluidHopperBlockEntity) {
-			// 	boolean success = false;
-			// 	if (item.is(Items.BUCKET)) {
-			// 		success |= BasicFluidHopperBlockEntity.tryFillBucket(item, level, pos, player, hand,
-			// 				((BasicFluidHopperBlockEntity) blockEntity).fluidStorage);
-			// 	} else if (item.getItem() instanceof BucketItem) {
-			// 		success |= BasicFluidHopperBlockEntity.tryDrainBucket(item, level, pos, player,
-			// 				hand, ((BasicFluidHopperBlockEntity) blockEntity).fluidStorage);
-			// 	}
-			// 	if (success) {
-			// 		return ItemInteractionResult.CONSUME;
-			// 	}
-			// }
+			BlockEntity blockEntity = level.getBlockEntity(pos);
+			if (blockEntity instanceof BasicFluidHopperBlockEntity) {
+				boolean success = false;
+				if (item.is(Items.BUCKET)) {
+					success |= FluidHopper.tryFillBucket(item, level, pos, player, hand,
+							((BasicFluidHopperBlockEntity) blockEntity).fluidStorage);
+				} else if (item.getItem() instanceof BucketItem) {
+					success |= FluidHopper.tryDrainBucket(item, level, pos, player,
+							hand, ((BasicFluidHopperBlockEntity) blockEntity).fluidStorage);
+				}
+				if (success) {
+					return ItemInteractionResult.CONSUME;
+				}
+			}
 			return ItemInteractionResult.SUCCESS;
 		}
 	}
