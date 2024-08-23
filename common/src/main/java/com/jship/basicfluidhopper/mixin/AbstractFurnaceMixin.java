@@ -54,12 +54,12 @@ public abstract class AbstractFurnaceMixin {
                 blockEntity, true, null);
         // Even though most of this should have been checked already, double-check
         // before using fuel
-        if (fluidHopper != null && !fluidHopper.isEmpty()
-                && fluidHopper.fluidStorage.getResource(0).is(BasicFluidHopper.C_FLUID_FUEL)
-                && fluidHopper.fluidStorage.getAmount(0) >= BasicFluidHopper.FUEL_CONSUME_STEP
-                && BasicFluidHopperBlockEntity.extract(fluidHopper, BasicFluidHopper.FUEL_CONSUME_STEP)) {
-            // Set b4 to false here to bypass the logic that uses traditional fuel
-            b4.set(false);
-        }
+        // if (fluidHopper != null && !fluidHopper.isEmpty()
+        //         && fluidHopper.fluidStorage.getResource(0).is(BasicFluidHopper.C_FLUID_FUEL)
+        //         && fluidHopper.fluidStorage.getAmount(0) >= BasicFluidHopper.FUEL_CONSUME_STEP
+        //         && BasicFluidHopperBlockEntity.extract(fluidHopper, BasicFluidHopper.FUEL_CONSUME_STEP)) {
+        //     // Set b4 to false here to bypass the logic that uses traditional fuel
+        //     b4.set(false);
+        // }
     }
 }

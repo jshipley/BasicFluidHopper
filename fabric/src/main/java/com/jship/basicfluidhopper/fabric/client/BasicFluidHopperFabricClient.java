@@ -19,18 +19,18 @@ public class BasicFluidHopperFabricClient implements ClientModInitializer {
 
         @Override
         public void onInitializeClient() {
-                EntityRendererRegistry.register(BasicFluidHopper.BASIC_FLUID_HOPPER_MINECART_ENTITY.get(),
-                                context -> new MinecartRenderer<>(context, ModelLayers.HOPPER_MINECART));
-                FluidRenderHandlerRegistry.INSTANCE.register(BasicFluidHopper.HONEY.get(),
-                                BasicFluidHopper.FLOWING_HONEY.get(),
-                                new SimpleFluidRenderHandler(
-                                                ResourceLocation.fromNamespaceAndPath(BasicFluidHopper.MOD_ID,
-                                                                "block/honey_still"),
-                                                ResourceLocation.fromNamespaceAndPath(BasicFluidHopper.MOD_ID,
-                                                                "block/honey_flow"),
-                                                SimpleFluidRenderHandler.WATER_OVERLAY,
-                                                0xCCFED167));
-                BlockRenderLayerMap.INSTANCE.putFluids(RenderType.translucent(),
-                                BasicFluidHopper.HONEY.get(), BasicFluidHopper.FLOWING_HONEY.get());
+                // EntityRendererRegistry.register(BasicFluidHopper.BASIC_FLUID_HOPPER_MINECART_ENTITY.get(),
+                //                 context -> new MinecartRenderer<>(context, ModelLayers.HOPPER_MINECART));
+                // FluidRenderHandlerRegistry.INSTANCE.register(BasicFluidHopper.HONEY_FLUID.get(),
+                //                 BasicFluidHopper.HONEY_FLUID_FLOWING.get(),
+                //                 new SimpleFluidRenderHandler(
+                //                                 ResourceLocation.fromNamespaceAndPath(BasicFluidHopper.MOD_ID,
+                //                                                 "block/honey_still"),
+                //                                 ResourceLocation.fromNamespaceAndPath(BasicFluidHopper.MOD_ID,
+                //                                                 "block/honey_flow"),
+                //                                 SimpleFluidRenderHandler.WATER_OVERLAY,
+                //                                 0xCCFED167));
+                // BlockRenderLayerMap.INSTANCE.putFluids(RenderType.translucent(),
+                //                 BasicFluidHopper.HONEY_FLUID.get(), BasicFluidHopper.HONEY_FLUID_FLOWING.get());
         }
 }

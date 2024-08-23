@@ -2,9 +2,9 @@ package com.jship.basicfluidhopper.vehicle;
 
 import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.block.BasicFluidHopperBlockEntity;
+import com.jship.basicfluidhopper.fluid.HopperFluidStorage;
 
-import earth.terrarium.common_storage_lib.fluid.impl.SimpleFluidStorage;
-import earth.terrarium.common_storage_lib.resources.fluid.util.FluidAmounts;
+import dev.architectury.fluid.FluidStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -23,14 +23,18 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart {
 	private boolean enabled = true;
 	public static final int TRANSFER_COOLDOWN = 8;
 	public static final int BUCKET_CAPACITY = 1;
-	public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(this, BasicFluidHopper.FLUID_CONTENTS, 1, BUCKET_CAPACITY * FluidAmounts.BUCKET);
+	public final HopperFluidStorage fluidStorage;
 
 	public BasicFluidHopperMinecartEntity(EntityType<?> entityType, Level level) {
 		super(entityType, level);
+		
+		this.fluidStorage = HopperFluidStorage.createFluidStorage(BUCKET_CAPACITY * FluidStack.bucketAmount(), FluidStack.bucketAmount(), () -> this.setChanged());
 	}
 
 	public BasicFluidHopperMinecartEntity(EntityType<?> type, Level level, double x, double y, double z) {
 		super(type, level, x, y, z);
+
+		this.fluidStorage = HopperFluidStorage.createFluidStorage(BUCKET_CAPACITY * FluidStack.bucketAmount(), FluidStack.bucketAmount(), () -> this.setChanged());
 	}
 
 	public static BasicFluidHopperMinecartEntity create(
@@ -43,6 +47,10 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart {
 	@Override
 	public AbstractMinecart.Type getMinecartType() {
 		return AbstractMinecart.Type.HOPPER;
+	}
+
+	public HopperFluidStorage getFluidStorage() {
+		return this.fluidStorage;
 	}
 
 	@Override
@@ -86,14 +94,14 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart {
 
 	@Override
 	public InteractionResult interact(Player player, InteractionHand hand) {
-		ItemStack item = player.getItemInHand(hand);
-		if (item.is(Items.BUCKET)) {
-			return BasicFluidHopperBlockEntity.tryFillBucket(item, getCommandSenderWorld(), blockPosition(), player, hand,
-					fluidStorage) ? InteractionResult.CONSUME : InteractionResult.SUCCESS;
-		} else if (item.getItem() instanceof BucketItem) {
-			return BasicFluidHopperBlockEntity.tryDrainBucket(item, getCommandSenderWorld(), blockPosition(), player, hand,
-					fluidStorage) ? InteractionResult.CONSUME : InteractionResult.SUCCESS;
-		}
+		// ItemStack item = player.getItemInHand(hand);
+		// if (item.is(Items.BUCKET)) {
+		// 	return BasicFluidHopperBlockEntity.tryFillBucket(item, getCommandSenderWorld(), blockPosition(), player, hand,
+		// 			fluidStorage) ? InteractionResult.CONSUME : InteractionResult.SUCCESS;
+		// } else if (item.getItem() instanceof BucketItem) {
+		// 	return BasicFluidHopperBlockEntity.tryDrainBucket(item, getCommandSenderWorld(), blockPosition(), player, hand,
+		// 			fluidStorage) ? InteractionResult.CONSUME : InteractionResult.SUCCESS;
+		// }
 		return InteractionResult.SUCCESS;
 	}
 

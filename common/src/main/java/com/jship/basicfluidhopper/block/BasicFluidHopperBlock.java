@@ -40,7 +40,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class BasicFluidHopperBlock extends BaseEntityBlock {
-	public static final MapCodec<BasicFluidHopperBlock> CODEC = BasicFluidHopperBlock.simpleCodec(BasicFluidHopperBlock::new);
+	public static final MapCodec<BasicFluidHopperBlock> CODEC = BasicFluidHopperBlock
+			.simpleCodec(BasicFluidHopperBlock::new);
 	public static final DirectionProperty FACING = BlockStateProperties.FACING_HOPPER;
 	public static final BooleanProperty ENABLED = BlockStateProperties.ENABLED;
 	private static final VoxelShape TOP_SHAPE = Block.box(0.0, 10.0, 0.0, 16.0, 16.0, 16.0);
@@ -119,7 +120,8 @@ public class BasicFluidHopperBlock extends BaseEntityBlock {
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
 		Direction direction = ctx.getClickedFace().getOpposite();
-		return this.defaultBlockState().setValue(FACING, direction.getAxis() == Direction.Axis.Y ? Direction.DOWN : direction)
+		return this.defaultBlockState()
+				.setValue(FACING, direction.getAxis() == Direction.Axis.Y ? Direction.DOWN : direction)
 				.setValue(ENABLED, Boolean.valueOf(true));
 	}
 
@@ -131,7 +133,9 @@ public class BasicFluidHopperBlock extends BaseEntityBlock {
 	@Nullable
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
 			BlockEntityType<T> type) {
-		return level.isClientSide ? null : createTickerHelper(type, BasicFluidHopper.BASIC_FLUID_HOPPER_BLOCK_ENTITY.get(), BasicFluidHopperBlockEntity::pushItemsTick);
+		return level.isClientSide ? null
+				: createTickerHelper(type, BasicFluidHopper.BASIC_FLUID_HOPPER_BLOCK_ENTITY.get(),
+						BasicFluidHopperBlockEntity::pushFluidTick);
 	}
 
 	@Override
@@ -147,20 +151,20 @@ public class BasicFluidHopperBlock extends BaseEntityBlock {
 		if (level.isClientSide) {
 			return ItemInteractionResult.SUCCESS;
 		} else {
-			BlockEntity blockEntity = level.getBlockEntity(pos);
-			if (blockEntity instanceof BasicFluidHopperBlockEntity) {
-				boolean success = false;
-				if (item.is(Items.BUCKET)) {
-					success |= BasicFluidHopperBlockEntity.tryFillBucket(item, level, pos, player, hand,
-							((BasicFluidHopperBlockEntity) blockEntity).fluidStorage);
-				} else if (item.getItem() instanceof BucketItem) {
-					success |= BasicFluidHopperBlockEntity.tryDrainBucket(item, level, pos, player,
-							hand, ((BasicFluidHopperBlockEntity) blockEntity).fluidStorage);
-				}
-				if (success) {
-					return ItemInteractionResult.CONSUME;
-				}
-			}
+			// BlockEntity blockEntity = level.getBlockEntity(pos);
+			// if (blockEntity instanceof BasicFluidHopperBlockEntity) {
+			// 	boolean success = false;
+			// 	if (item.is(Items.BUCKET)) {
+			// 		success |= BasicFluidHopperBlockEntity.tryFillBucket(item, level, pos, player, hand,
+			// 				((BasicFluidHopperBlockEntity) blockEntity).fluidStorage);
+			// 	} else if (item.getItem() instanceof BucketItem) {
+			// 		success |= BasicFluidHopperBlockEntity.tryDrainBucket(item, level, pos, player,
+			// 				hand, ((BasicFluidHopperBlockEntity) blockEntity).fluidStorage);
+			// 	}
+			// 	if (success) {
+			// 		return ItemInteractionResult.CONSUME;
+			// 	}
+			// }
 			return ItemInteractionResult.SUCCESS;
 		}
 	}

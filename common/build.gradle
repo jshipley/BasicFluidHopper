@@ -8,10 +8,7 @@ dependencies {
     // Do NOT use other classes from Fabric Loader.
     modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
 
-    modImplementation("earth.terrarium.common_storage_lib:common-storage-lib-common-1.21:${rootProject.csl_version}")
-    modImplementation("earth.terrarium.common_storage_lib:common-storage-lib-data-common-1.21:${rootProject.csl_version}")
-    modImplementation("earth.terrarium.common_storage_lib:common-storage-lib-lookup-common-1.21:${rootProject.csl_version}")
-    modImplementation("earth.terrarium.common_storage_lib:common-storage-lib-resources-common-1.21:${rootProject.csl_version}")
+    modImplementation "dev.architectury:architectury:$rootProject.architectury_api_version"
 }
 
 loom {
