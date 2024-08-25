@@ -2,6 +2,7 @@ package com.jship.basicfluidhopper.fluid.fabric;
 
 import java.util.Optional;
 
+import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.fluid.HopperFluidStorage;
 import com.jship.basicfluidhopper.vehicle.BasicFluidHopperMinecartEntity;
 
@@ -20,13 +21,13 @@ import net.minecraft.world.level.Level;
 public class HopperFluidStorageImpl extends HopperFluidStorage {
     private final long maxAmount;
     private final long transferRate;
-    private final Runnable setChanged;
+    private final Runnable markDirty;
     private final SingleVariantStorage<FluidVariant> fluidStorage;
 
-    HopperFluidStorageImpl(long maxAmount, long transferRate, Runnable setChanged) {
+    HopperFluidStorageImpl(long maxAmount, long transferRate, Runnable markDirty) {
         this.maxAmount = maxAmount;
         this.transferRate = transferRate;
-        this.setChanged = setChanged;
+        this.markDirty = markDirty;
         fluidStorage = new SingleVariantStorage<>() {
             @Override
             protected FluidVariant getBlankVariant() {
@@ -40,13 +41,13 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
 
             @Override
             protected void onFinalCommit() {
-                HopperFluidStorageImpl.this.setChanged.run();
+                HopperFluidStorageImpl.this.markDirty.run();
             }
         };
     }
 
-    public static HopperFluidStorage createFluidStorage(long capacity, long transferRate, Runnable setChanged) {
-        return new HopperFluidStorageImpl(capacity, transferRate, setChanged);
+    public static HopperFluidStorage createFluidStorage(long capacity, long transferRate, Runnable markDirty) {
+        return new HopperFluidStorageImpl(capacity, transferRate, markDirty);
     }
 
     @Override
@@ -107,9 +108,8 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
         long filled = 0;
         try (Transaction tx = Transaction.openOuter()) {
             FluidVariant resource = fluidStorage.getResource();
-            long maxInsert = Math.min(this.transferRate, fluidStorage.getCapacity());
-            long inserted = destStorage.insert(resource, maxInsert, tx);
-            long extracted = fluidStorage.extract(resource, inserted, tx);
+            long extracted = fluidStorage.extract(resource, transferRate, tx);
+            long inserted = destStorage.insert(resource, extracted, tx);
             if (inserted == extracted) filled = inserted;
             if (filled > 0 && !simulate) tx.commit();
         }
@@ -217,7 +217,7 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
     public void setFluidStack(FluidStack fluid) {
         fluidStorage.variant = FluidStackHooksFabric.toFabric(fluid);
         fluidStorage.amount = fluid.getAmount();
-        this.setChanged.run();
+        this.markDirty.run();
     }
 
     @Override
@@ -228,7 +228,7 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
     @Override
     public void setAmount(long amount) {
         fluidStorage.amount = amount;
-        this.setChanged.run();
+        this.markDirty.run();
     }
 
     @Override

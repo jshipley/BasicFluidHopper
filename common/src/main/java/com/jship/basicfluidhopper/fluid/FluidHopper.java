@@ -36,9 +36,9 @@ public interface FluidHopper {
     public static final long MAX_TRANSFER = FluidStack.bucketAmount();
 
     /**
-     * Call setChanged for the entity
+     * Call markDirty for the entity
      */
-    public abstract void setChanged();
+    public abstract void markDirty();
 
     /**
      * @return a fluid storage for the fluid hopper
@@ -63,13 +63,12 @@ public interface FluidHopper {
      */
     public static boolean fillAndDrain(Level level, BlockPos pos, BlockState state, FluidHopper fluidHopper) {
         if (level.isClientSide) return false;
-
         if (!fluidHopper.needsCooldown() && fluidHopper.isEnabled()) {
             if ((!fluidHopper.getFluidStorage().isEmpty() && FluidHopper.fill(level, pos, fluidHopper))
                 || (!fluidHopper.getFluidStorage().isFull() && FluidHopper.drain(level, pos, fluidHopper))) {
                 // fill or drain succeeded
                 fluidHopper.setTransferCooldown(TRANSFER_COOLDOWN);
-                fluidHopper.setChanged();
+                fluidHopper.markDirty();
                 return true;
             }
         }
@@ -146,7 +145,7 @@ public interface FluidHopper {
         // Try to drain a fluid storage above
         long drained = fluidHopper.getFluidStorage().drainBlockPos(level, pos.above(), true);
         if (drained > 0) {
-            fluidHopper.getFluidStorage().drainBlockPos(level, pos.relative(fluidHopper.getFacing()), false);
+            fluidHopper.getFluidStorage().drainBlockPos(level, pos.above(), false);
             return true;
         }
 
@@ -169,13 +168,15 @@ public interface FluidHopper {
         // try to drain a source block above the hopper
         if (aboveState.getBlock() instanceof BucketPickup bucketPickup) {
             FluidState aboveFluidState = aboveState.getFluidState();
-            FluidStack fluid = FluidStack.create(aboveFluidState.getType(), FluidStack.bucketAmount());
-            long inserted = fluidHopper.getFluidStorage().add(fluid, FluidStack.bucketAmount(), true);
-            if (inserted == FluidStack.bucketAmount()) {
-                ItemStack bucket = bucketPickup.pickupBlock(null, level, pos.above(), aboveState);
-                if (!bucket.isEmpty()) {
-                    fluidHopper.getFluidStorage().add(fluid, FluidStack.bucketAmount(), false);
-                    return true;
+            if (aboveFluidState.isSource()) {
+                FluidStack fluid = FluidStack.create(aboveFluidState.getType(), FluidStack.bucketAmount());
+                long inserted = fluidHopper.getFluidStorage().add(fluid, FluidStack.bucketAmount(), true);
+                if (inserted == FluidStack.bucketAmount()) {
+                    ItemStack bucket = bucketPickup.pickupBlock(null, level, pos.above(), aboveState);
+                    if (!bucket.isEmpty()) {
+                        fluidHopper.getFluidStorage().add(fluid, FluidStack.bucketAmount(), false);
+                        return true;
+                    }
                 }
             }
         }
@@ -224,6 +225,7 @@ public interface FluidHopper {
 
     public static boolean tryDrainBucket(ItemStack item, Level level, BlockPos pos, Player player, InteractionHand hand, HopperFluidStorage fluidStorage) {
         if (!(item.getItem() instanceof BucketItem bucketItem)) return false;
+        BasicFluidHopper.LOGGER.info("Item {} is lava? {}, is honey? {}", item.getItem(), item.is(Items.LAVA_BUCKET), item.is(BasicFluidHopper.HONEY_BUCKET.get()));
         
         FluidStack fluid = FluidStack.create(bucketItem.arch$getFluid(), FluidStack.bucketAmount());
         if (fluid.isEmpty()) return false;
@@ -231,10 +233,8 @@ public interface FluidHopper {
         long inserted = fluidStorage.add(fluid, FluidStack.bucketAmount(), true);
         if (inserted != FluidStack.bucketAmount()) return false;
 
-        ItemStack emptyBucket = new ItemStack(Items.BUCKET);
-        emptyBucket.applyComponents(bucketItem.components());
-        player.setItemInHand(hand, ItemUtils.createFilledResult(item, player, emptyBucket));
         SoundEvent bucketEmpty;
+        BasicFluidHopper.LOGGER.info("Item {} is lava? {}, is honey? {}", item.getItem(), item.is(Items.LAVA_BUCKET), item.is(BasicFluidHopper.HONEY_BUCKET.get()));
         if (item.is(Items.LAVA_BUCKET)) {
             bucketEmpty = SoundEvents.BUCKET_EMPTY_LAVA;
         } else if (item.is(BasicFluidHopper.HONEY_BUCKET.get())) {
@@ -244,7 +244,12 @@ public interface FluidHopper {
         }
         level.playSound(null, pos, bucketEmpty, SoundSource.BLOCKS, 1.0F, 1.0F);
         level.gameEvent(null, GameEvent.FLUID_PLACE, pos);
+        
+        ItemStack emptyBucket = new ItemStack(Items.BUCKET);
+        emptyBucket.applyComponents(bucketItem.components());
+        player.setItemInHand(hand, ItemUtils.createFilledResult(item, player, emptyBucket));
         fluidStorage.add(fluid, FluidStack.bucketAmount(), false);
+        
         return true;
     }
 }

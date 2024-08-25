@@ -14,3 +14,10 @@ dependencies {
 loom {
     accessWidenerPath = file("src/main/resources/basic_fluid_hopper.accesswidener")
 }
+
+sourceSets {
+    main {
+        resources.srcDir "src/main/generated"
+        resources.exclude ".cache"
+    }
+}

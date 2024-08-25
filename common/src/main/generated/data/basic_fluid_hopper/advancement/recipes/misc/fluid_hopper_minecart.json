@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_fluid_hopper_and_minecart": {
+      "conditions": {
+        "items": [
+          {
+            "items": "basic_fluid_hopper:basic_fluid_hopper"
+          },
+          {
+            "items": "minecraft:minecart"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "basic_fluid_hopper:fluid_hopper_minecart"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_fluid_hopper_and_minecart"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "basic_fluid_hopper:fluid_hopper_minecart"
+    ]
+  }
+}

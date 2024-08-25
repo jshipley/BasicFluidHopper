@@ -1,7 +1,7 @@
 package com.jship.basicfluidhopper.mixin;
 
 import com.jship.basicfluidhopper.BasicFluidHopper;
-import com.jship.basicfluidhopper.block.BasicFluidHopperBlockEntity;
+import com.jship.basicfluidhopper.block.entity.BasicFluidHopperBlockEntity;
 import com.jship.basicfluidhopper.util.FluidHopperUtil;
 
 import org.spongepowered.asm.mixin.Mixin;

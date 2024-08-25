@@ -3,9 +3,9 @@
   "id": "basic_fluid_hopper",
   "version": "${version}",
   "name": "Basic Fluid Hopper",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "description": "A hopper that moves fluids instead of items.",
   "authors": [
-    "Me!"
+    "jshipley"
   ],
   "contact": {
     "homepage": "https://fabricmc.net/",
@@ -20,6 +20,12 @@
     ],
     "client": [
       "com.jship.basicfluidhopper.client.fabric.BasicFluidHopperFabricClient"
+    ],
+    "jade": [
+      "com.jship.basicfluidhopper.jade.fabric.JadePlugin"
+    ],
+    "fabric-datagen": [
+      "com.jship.basicfluidhopper.datagen.fabric.BasicFluidHopperDataGen"
     ]
   },
   "mixins": [

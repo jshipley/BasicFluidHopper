@@ -1,6 +1,7 @@
 package com.jship.basicfluidhopper.block;
 
 import com.jship.basicfluidhopper.BasicFluidHopper;
+import com.jship.basicfluidhopper.block.entity.BasicFluidHopperBlockEntity;
 import com.jship.basicfluidhopper.fluid.FluidHopper;
 import com.mojang.serialization.MapCodec;
 

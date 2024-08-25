@@ -3,7 +3,7 @@ package com.jship.basicfluidhopper.util;
 import org.jetbrains.annotations.Nullable;
 
 import com.jship.basicfluidhopper.BasicFluidHopper;
-import com.jship.basicfluidhopper.block.BasicFluidHopperBlockEntity;
+import com.jship.basicfluidhopper.block.entity.BasicFluidHopperBlockEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

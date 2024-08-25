@@ -17,11 +17,11 @@ public abstract class HopperFluidStorage {
      * Create a new fluid storage for @blockEntity
      * @param maxAmount the maximum amount of fluid the storage can hold
      * @param transferRate the maximum amount of fluid that can be drained or filled in one tick
-     * @param setChanged called when the contents of the fluid storage have changed
+     * @param markDirty called when the contents of the fluid storage have changed
      * @return a new HopperFluidStorageImpl for the appropriate platform
      */
     @ExpectPlatform
-    public static HopperFluidStorage createFluidStorage(long maxAmount, long transferRate, Runnable setChanged) {
+    public static HopperFluidStorage createFluidStorage(long maxAmount, long transferRate, Runnable markDirty) {
         throw new AssertionError();
     }
 

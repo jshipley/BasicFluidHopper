@@ -1,5 +1,7 @@
 package com.jship.basicfluidhopper.vehicle;
 
+import java.util.Optional;
+
 import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.fluid.FluidHopper;
 import com.jship.basicfluidhopper.fluid.HopperFluidStorage;
@@ -10,6 +12,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
@@ -28,13 +31,13 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 	public BasicFluidHopperMinecartEntity(EntityType<?> entityType, Level level) {
 		super(entityType, level);
 		
-		this.fluidStorage = HopperFluidStorage.createFluidStorage(BUCKET_CAPACITY * FluidStack.bucketAmount(), FluidStack.bucketAmount(), () -> this.setChanged());
+		this.fluidStorage = HopperFluidStorage.createFluidStorage(BUCKET_CAPACITY * FluidStack.bucketAmount(), FluidStack.bucketAmount(), () -> this.markDirty());
 	}
 
 	public BasicFluidHopperMinecartEntity(EntityType<?> type, Level level, double x, double y, double z) {
 		super(type, level, x, y, z);
 
-		this.fluidStorage = HopperFluidStorage.createFluidStorage(BUCKET_CAPACITY * FluidStack.bucketAmount(), FluidStack.bucketAmount(), () -> this.setChanged());
+		this.fluidStorage = HopperFluidStorage.createFluidStorage(BUCKET_CAPACITY * FluidStack.bucketAmount(), FluidStack.bucketAmount(), () -> this.markDirty());
 	}
 
 	public static BasicFluidHopperMinecartEntity create(
@@ -85,12 +88,12 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 	public void tick() {
 		super.tick();
 		if (!this.level().isClientSide && this.isAlive() && this.isEnabled() && this.canOperate()) {
-			this.setChanged();
+			this.markDirty();
 		}
 	}
 
 	public boolean canOperate() {
-		return FluidHopper.drain(this.level(), this.getOnPos().above(2), this);
+		return FluidHopper.drain(this.level(), this.getOnPos(), this);
 	}
 
 	@Override
@@ -107,13 +110,19 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 	}
 
 	@Override
-	public void setChanged() {
+	public void markDirty() {
 	}
 
 	@Override
 	protected Item getDropItem() {
 		return BasicFluidHopper.BASIC_FLUID_HOPPER_MINECART_ITEM.get();
 	}
+
+	@Override
+	// Overriding destroy because for some reason getDropItem wasn't being recognized
+	protected void destroy(DamageSource source) {
+        this.destroy(this.getDropItem());
+    }
 
 	@Override
 	public ItemStack getPickResult() {
@@ -124,12 +133,30 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 	protected void addAdditionalSaveData(CompoundTag nbt) {
 		super.addAdditionalSaveData(nbt);
 		nbt.putBoolean("enabled", this.enabled);
+		CompoundTag jadeData = new CompoundTag();
+		Optional<FluidStack> fluid = fluidStorage.getFluidStack();
+		if (fluid.isPresent()) {
+			nbt.put("fluid_stack", fluid.get().write(registryAccess(), new CompoundTag()));
+			jadeData.putLong("amount", fluid.get().getAmount());
+			jadeData.putString("type", fluid.get().getFluid().arch$registryName().getNamespace() + ":" + fluid.get().getFluid().arch$registryName().getPath());
+		} else {
+			jadeData.putLong("amount", 0L);
+			jadeData.putString("type", FluidStack.empty().getFluid().arch$registryName().getNamespace() + ":" + FluidStack.empty().getFluid().arch$registryName().getPath());
+		}
+		nbt.put("JadeFluidStorage", jadeData);
+		nbt.put("fluid_storage", jadeData);
 	}
 
 	@Override
 	protected void readAdditionalSaveData(CompoundTag nbt) {
 		super.readAdditionalSaveData(nbt);
 		this.enabled = nbt.contains("enabled") ? nbt.getBoolean("enabled") : true;
+		if (nbt.contains("fluid_stack")) {
+			CompoundTag fluidStack = nbt.getCompound("fluid_stack");
+			Optional<FluidStack> fluid = FluidStack.read(registryAccess(), fluidStack);
+			if (fluid.isPresent())
+				fluidStorage.setFluidStack(fluid.get());
+		}
 	}
 
 	@Override

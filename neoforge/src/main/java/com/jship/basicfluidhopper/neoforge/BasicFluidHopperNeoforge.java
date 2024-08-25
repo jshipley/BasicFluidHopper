@@ -2,7 +2,7 @@ package com.jship.basicfluidhopper.neoforge;
 
 import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.block.BasicFluidHopperBlock;
-import com.jship.basicfluidhopper.block.BasicFluidHopperBlockEntity;
+import com.jship.basicfluidhopper.block.entity.BasicFluidHopperBlockEntity;
 import com.jship.basicfluidhopper.vehicle.BasicFluidHopperMinecartEntity;
 import com.jship.basicfluidhopper.vehicle.BasicFluidHopperMinecartItem;
 

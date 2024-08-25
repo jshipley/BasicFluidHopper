@@ -2,9 +2,10 @@ package com.jship.basicfluidhopper;
 
 import com.google.common.base.Suppliers;
 import com.jship.basicfluidhopper.block.BasicFluidHopperBlock;
-import com.jship.basicfluidhopper.block.BasicFluidHopperBlockEntity;
+import com.jship.basicfluidhopper.block.entity.BasicFluidHopperBlockEntity;
 import com.jship.basicfluidhopper.vehicle.BasicFluidHopperMinecartEntity;
 import com.jship.basicfluidhopper.vehicle.BasicFluidHopperMinecartItem;
+import com.mojang.logging.LogUtils;
 
 import dev.architectury.core.block.ArchitecturyLiquidBlock;
 import dev.architectury.core.fluid.ArchitecturyFlowingFluid;
@@ -24,6 +25,7 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
@@ -38,11 +40,12 @@ import net.minecraft.world.level.material.PushReaction;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 public class BasicFluidHopper {
         public static final String MOD_ID = "basic_fluid_hopper";
-        public static final Logger LOGGER = LoggerFactory.getLogger("Basic Fluid Hopper");
+        public static final boolean DEBUG = false;
+        public static final Logger LOGGER = LogUtils.getLogger();
 
         public static final Supplier<RegistrarManager> MANAGER = Suppliers.memoize(() -> RegistrarManager.get(MOD_ID));
 
@@ -71,6 +74,10 @@ public class BasicFluidHopper {
 
         public static final TagKey<Fluid> C_HONEY = TagKey.create(Registries.FLUID,
                 ResourceLocation.fromNamespaceAndPath("c", "honey"));
+        public static final TagKey<Fluid> C_VISUAL_HONEY = TagKey.create(Registries.FLUID,
+                ResourceLocation.fromNamespaceAndPath("c", "visual/honey"));
+        public static final TagKey<Item> C_HONEY_BUCKETS = TagKey.create(Registries.ITEM,
+                ResourceLocation.fromNamespaceAndPath("c", "buckets/honey"));
         // Any fluid in tags/c/fluid/fuel will be usable in a furnace and will have the
         // same burn duration as lava
         public static final TagKey<Fluid> C_FLUID_FUEL = TagKey.create(Registries.FLUID,
@@ -131,10 +138,11 @@ public class BasicFluidHopper {
                         () -> new BasicFluidHopperMinecartItem(new Item.Properties().stacksTo(1).arch$tab(CreativeModeTabs.FUNCTIONAL_BLOCKS)));
                 HONEY_BUCKET = ITEMS.register(
                         ResourceLocation.fromNamespaceAndPath(BasicFluidHopper.MOD_ID, "honey_bucket"),
-                        () -> new ArchitecturyBucketItem(HONEY_FLUID, new Item.Properties().arch$tab(CreativeModeTabs.FUNCTIONAL_BLOCKS)));
+                        () -> new ArchitecturyBucketItem(HONEY_FLUID, new Item.Properties().arch$tab(CreativeModeTabs.FUNCTIONAL_BLOCKS).craftRemainder(Items.BUCKET)));
         }
 
         public static void init() {
+                if (DEBUG) LogUtils.configureRootLoggingLevel(Level.DEBUG);
                 new BasicFluidHopper();
         }
 }
