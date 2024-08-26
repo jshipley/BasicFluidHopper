@@ -18,6 +18,7 @@ import dev.architectury.registry.registries.Registrar;
 import dev.architectury.registry.registries.RegistrarManager;
 import dev.architectury.registry.registries.RegistrySupplier;
 import eu.midnightdust.lib.config.MidnightConfig;
+import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
@@ -30,6 +31,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -50,9 +52,6 @@ public class BasicFluidHopper {
         public static final Logger LOGGER = LogUtils.getLogger();
 
         public static final Supplier<RegistrarManager> MANAGER = Suppliers.memoize(() -> RegistrarManager.get(MOD_ID));
-
-        // CONSTANTS - could be configurable
-        public static final long FUEL_CONSUME_STEP = FluidStack.bucketAmount() / 20;
 
         public static final Registrar<Fluid> FLUIDS;
         public static final ArchitecturyFluidAttributes HONEY_FLUID_ATTRIBUTES;
@@ -146,6 +145,11 @@ public class BasicFluidHopper {
         public static void init() {
                 if (DEBUG) LogUtils.configureRootLoggingLevel(Level.DEBUG);
                 new BasicFluidHopper();
+
+                // Copy the water bucket dispenser behavior for honey buckets
+                DispenseItemBehavior dispenserBehavior = DispenserBlock.DISPENSER_REGISTRY.get(Items.WATER_BUCKET);
+                DispenserBlock.registerBehavior(HONEY_BUCKET.get(), dispenserBehavior);
+
                 MidnightConfig.init(MOD_ID, BasicFluidHopperConfig.class);
         }
 }

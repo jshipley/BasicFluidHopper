@@ -6,6 +6,7 @@ import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.config.BasicFluidHopperConfig;
 import com.jship.basicfluidhopper.fluid.FluidHopper;
 import com.jship.basicfluidhopper.fluid.HopperFluidStorage;
+import com.jship.basicfluidhopper.util.FluidHopperUtil;
 
 import dev.architectury.fluid.FluidStack;
 import net.minecraft.core.Direction;
@@ -22,6 +23,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.Level;
 
 public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements FluidHopper {
@@ -104,11 +106,16 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 
 		ItemStack item = player.getItemInHand(hand);
 		if (item.is(Items.BUCKET)) {
-			return FluidHopper.tryFillBucket(item, getCommandSenderWorld(), blockPosition(), player, hand,
-					fluidStorage) ? InteractionResult.CONSUME : InteractionResult.SUCCESS;
+				return FluidHopper.tryFillBucket(item, getCommandSenderWorld(), blockPosition(), player, hand,
+						fluidStorage) ? InteractionResult.CONSUME : InteractionResult.SUCCESS;
 		} else if (item.getItem() instanceof BucketItem) {
-			return FluidHopper.tryDrainBucket(item, getCommandSenderWorld(), blockPosition(), player, hand,
-					fluidStorage) ? InteractionResult.CONSUME : InteractionResult.SUCCESS;
+				return FluidHopper.tryDrainBucket(item, getCommandSenderWorld(), blockPosition(), player, hand,
+						fluidStorage) ? InteractionResult.CONSUME : InteractionResult.SUCCESS;
+			}
+		} else {
+			BasicFluidHopper.LOGGER.info("Fluid from item: {}", FluidHopperUtil.getFluidFromItem(player.getItemInHand(hand)).getFluid().arch$registryName());
+			if (fluidStorage.getFluidStack().isPresent())
+				BasicFluidHopper.LOGGER.info("Item from fluid: {}", FluidHopperUtil.getItemFromFluid(fluidStorage.getFluidStack().get(), player.getItemInHand(hand)));
 		}
 		return InteractionResult.SUCCESS;
 	}

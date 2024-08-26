@@ -10,5 +10,7 @@
     "basic_fluid_hopper.midnightconfig.title": "Basic Fluid Hopper",
     "basic_fluid_hopper.midnightconfig.TRANSFER_COOLDOWN": "Transfer cooldown (in ticks)",
     "basic_fluid_hopper.midnightconfig.BUCKET_CAPACITY": "Hopper capacity (in buckets)",
-    "basic_fluid_hopper.midnightconfig.MAX_TRANSFER": "Max fluid transfer per tick (in buckets)"
+    "basic_fluid_hopper.midnightconfig.MAX_TRANSFER": "Max fluid transfer per tick (in buckets)",
+    "basic_fluid_hopper.midnightconfig.FUEL_CONSUME_STEP": "Fuel burn amount (in buckets)",
+    "basic_fluid_hopper.midnightconfig.FUEL_CONSUME_STEP.tooltip": "Burn less fuel at a time to avoid wasting fuel"
 }

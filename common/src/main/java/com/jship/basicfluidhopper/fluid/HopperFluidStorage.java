@@ -8,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.vehicle.VehicleEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.Fluid;
 
 /**
  * A common fluid storage class for fluid hoppers (and minecarts)
@@ -90,6 +91,11 @@ public abstract class HopperFluidStorage {
      * @param fluid
      */
     public abstract void setFluidStack(FluidStack fluid);
+
+    /**
+     * @return the Fluid in the container
+     */
+    public abstract Fluid getFluid();
 
     /**
      * @return the current fluid amount in the fluid storage

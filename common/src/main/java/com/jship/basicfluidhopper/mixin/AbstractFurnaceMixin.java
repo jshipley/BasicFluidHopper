@@ -2,6 +2,7 @@ package com.jship.basicfluidhopper.mixin;
 
 import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.block.entity.BasicFluidHopperBlockEntity;
+import com.jship.basicfluidhopper.config.BasicFluidHopperConfig;
 import com.jship.basicfluidhopper.util.FluidHopperUtil;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,6 +14,7 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 
+import dev.architectury.fluid.FluidStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -31,7 +33,7 @@ public abstract class AbstractFurnaceMixin {
                 blockEntity.getBlockState(), blockEntity, true, null);
 
         if (fluidHopper != null) {
-            cir.setReturnValue((int)BasicFluidHopper.FUEL_CONSUME_STEP);
+            cir.setReturnValue((int)(BasicFluidHopperConfig.FUEL_CONSUME_STEP * FluidStack.bucketAmount()));
         }
     }
 
@@ -52,14 +54,13 @@ public abstract class AbstractFurnaceMixin {
             AbstractFurnaceBlockEntity blockEntity, CallbackInfo cbi, @Local(ordinal = 3) LocalBooleanRef b4) {
         BasicFluidHopperBlockEntity fluidHopper = FluidHopperUtil.getHopperInsertingFluid(level, pos, blockState,
                 blockEntity, true, null);
-        // Even though most of this should have been checked already, double-check
-        // before using fuel
-        // if (fluidHopper != null && !fluidHopper.isEmpty()
-        //         && fluidHopper.fluidStorage.getResource(0).is(BasicFluidHopper.C_FLUID_FUEL)
-        //         && fluidHopper.fluidStorage.getAmount(0) >= BasicFluidHopper.FUEL_CONSUME_STEP
-        //         && BasicFluidHopperBlockEntity.extract(fluidHopper, BasicFluidHopper.FUEL_CONSUME_STEP)) {
-        //     // Set b4 to false here to bypass the logic that uses traditional fuel
-        //     b4.set(false);
-        // }
+        if (fluidHopper != null && !fluidHopper.getFluidStorage().isEmpty() && fluidHopper.getFluidStorage().getFluid().is(BasicFluidHopper.C_FLUID_FUEL)) {
+            long fuel_consume_step = (long)(BasicFluidHopperConfig.FUEL_CONSUME_STEP * FluidStack.bucketAmount());
+            if (fluidHopper.getFluidStorage().remove(fuel_consume_step, true) == fuel_consume_step) {
+                fluidHopper.getFluidStorage().remove(fuel_consume_step, false);
+                // Set b4 to false here to bypass the logic that uses traditional fuel
+                b4.set(false);
+            }
+        }
     }
 }

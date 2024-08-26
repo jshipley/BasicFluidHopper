@@ -17,6 +17,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.vehicle.VehicleEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.Fluid;
 
 public class HopperFluidStorageImpl extends HopperFluidStorage {
     private final long maxAmount;
@@ -117,7 +118,6 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
     }
 
     public long add(FluidStack fluid, long amount, boolean simulate) {
-        BasicFluidHopper.LOGGER.info("before adding: {}", fluidStorage.getAmount());
         if (isFull()) return 0;
         long added = 0;
         try (Transaction tx = Transaction.openOuter()) {
@@ -221,6 +221,11 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
         fluidStorage.variant = FluidStackHooksFabric.toFabric(fluid);
         fluidStorage.amount = fluid.getAmount();
         this.markDirty.run();
+    }
+
+    @Override
+    public Fluid getFluid() {
+        return fluidStorage.getResource().getFluid();
     }
 
     @Override

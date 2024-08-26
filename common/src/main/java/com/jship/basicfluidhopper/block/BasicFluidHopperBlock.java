@@ -31,6 +31,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.BooleanOp;
@@ -156,11 +157,12 @@ public class BasicFluidHopperBlock extends BaseEntityBlock {
 			if (blockEntity instanceof BasicFluidHopperBlockEntity) {
 				boolean success = false;
 				if (item.is(Items.BUCKET)) {
-					success |= FluidHopper.tryFillBucket(item, level, pos, player, hand,
-							((BasicFluidHopperBlockEntity) blockEntity).fluidStorage);
+						success |= FluidHopper.tryFillBucket(item, level, pos, player, hand,
+								((BasicFluidHopperBlockEntity) blockEntity).fluidStorage);
 				} else if (item.getItem() instanceof BucketItem) {
-					success |= FluidHopper.tryDrainBucket(item, level, pos, player,
-							hand, ((BasicFluidHopperBlockEntity) blockEntity).fluidStorage);
+						success |= FluidHopper.tryDrainBucket(item, level, pos, player,
+								hand, ((BasicFluidHopperBlockEntity) blockEntity).fluidStorage);
+					}
 				}
 				if (success) {
 					return ItemInteractionResult.CONSUME;
