@@ -3,6 +3,7 @@ package com.jship.basicfluidhopper;
 import com.google.common.base.Suppliers;
 import com.jship.basicfluidhopper.block.BasicFluidHopperBlock;
 import com.jship.basicfluidhopper.block.entity.BasicFluidHopperBlockEntity;
+import com.jship.basicfluidhopper.config.BasicFluidHopperConfig;
 import com.jship.basicfluidhopper.vehicle.BasicFluidHopperMinecartEntity;
 import com.jship.basicfluidhopper.vehicle.BasicFluidHopperMinecartItem;
 import com.mojang.logging.LogUtils;
@@ -16,6 +17,7 @@ import dev.architectury.fluid.FluidStack;
 import dev.architectury.registry.registries.Registrar;
 import dev.architectury.registry.registries.RegistrarManager;
 import dev.architectury.registry.registries.RegistrySupplier;
+import eu.midnightdust.lib.config.MidnightConfig;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
@@ -144,5 +146,6 @@ public class BasicFluidHopper {
         public static void init() {
                 if (DEBUG) LogUtils.configureRootLoggingLevel(Level.DEBUG);
                 new BasicFluidHopper();
+                MidnightConfig.init(MOD_ID, BasicFluidHopperConfig.class);
         }
 }

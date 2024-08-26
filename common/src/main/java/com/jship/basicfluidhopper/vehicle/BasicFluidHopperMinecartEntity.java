@@ -3,6 +3,7 @@ package com.jship.basicfluidhopper.vehicle;
 import java.util.Optional;
 
 import com.jship.basicfluidhopper.BasicFluidHopper;
+import com.jship.basicfluidhopper.config.BasicFluidHopperConfig;
 import com.jship.basicfluidhopper.fluid.FluidHopper;
 import com.jship.basicfluidhopper.fluid.HopperFluidStorage;
 
@@ -31,13 +32,13 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 	public BasicFluidHopperMinecartEntity(EntityType<?> entityType, Level level) {
 		super(entityType, level);
 		
-		this.fluidStorage = HopperFluidStorage.createFluidStorage(BUCKET_CAPACITY * FluidStack.bucketAmount(), FluidStack.bucketAmount(), () -> this.markDirty());
+		this.fluidStorage = HopperFluidStorage.createFluidStorage(BasicFluidHopperConfig.BUCKET_CAPACITY * FluidStack.bucketAmount(),  (long)(FluidStack.bucketAmount() * BasicFluidHopperConfig.MAX_TRANSFER), () -> this.markDirty());
 	}
 
 	public BasicFluidHopperMinecartEntity(EntityType<?> type, Level level, double x, double y, double z) {
 		super(type, level, x, y, z);
 
-		this.fluidStorage = HopperFluidStorage.createFluidStorage(BUCKET_CAPACITY * FluidStack.bucketAmount(), FluidStack.bucketAmount(), () -> this.markDirty());
+		this.fluidStorage = HopperFluidStorage.createFluidStorage(BasicFluidHopperConfig.BUCKET_CAPACITY * FluidStack.bucketAmount(),  (long)(FluidStack.bucketAmount() * BasicFluidHopperConfig.MAX_TRANSFER), () -> this.markDirty());
 	}
 
 	public static BasicFluidHopperMinecartEntity create(
@@ -96,8 +97,11 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 		return FluidHopper.drain(this.level(), this.getOnPos(), this);
 	}
 
+	@SuppressWarnings("resource")
 	@Override
 	public InteractionResult interact(Player player, InteractionHand hand) {
+		if (this.level().isClientSide) return InteractionResult.SUCCESS;
+
 		ItemStack item = player.getItemInHand(hand);
 		if (item.is(Items.BUCKET)) {
 			return FluidHopper.tryFillBucket(item, getCommandSenderWorld(), blockPosition(), player, hand,

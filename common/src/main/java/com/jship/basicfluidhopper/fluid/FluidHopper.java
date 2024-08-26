@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.jship.basicfluidhopper.BasicFluidHopper;
+import com.jship.basicfluidhopper.config.BasicFluidHopperConfig;
 
 import dev.architectury.fluid.FluidStack;
 import net.minecraft.core.BlockPos;
@@ -30,11 +31,6 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
 
 public interface FluidHopper {
-    // TODO Add mod configuration
-    public static final int TRANSFER_COOLDOWN = 8;
-    public static final int BUCKET_CAPACITY = 1;
-    public static final long MAX_TRANSFER = FluidStack.bucketAmount();
-
     /**
      * Call markDirty for the entity
      */
@@ -67,7 +63,7 @@ public interface FluidHopper {
             if ((!fluidHopper.getFluidStorage().isEmpty() && FluidHopper.fill(level, pos, fluidHopper))
                 || (!fluidHopper.getFluidStorage().isFull() && FluidHopper.drain(level, pos, fluidHopper))) {
                 // fill or drain succeeded
-                fluidHopper.setTransferCooldown(TRANSFER_COOLDOWN);
+                fluidHopper.setTransferCooldown(BasicFluidHopperConfig.TRANSFER_COOLDOWN);
                 fluidHopper.markDirty();
                 return true;
             }
@@ -225,7 +221,6 @@ public interface FluidHopper {
 
     public static boolean tryDrainBucket(ItemStack item, Level level, BlockPos pos, Player player, InteractionHand hand, HopperFluidStorage fluidStorage) {
         if (!(item.getItem() instanceof BucketItem bucketItem)) return false;
-        BasicFluidHopper.LOGGER.info("Item {} is lava? {}, is honey? {}", item.getItem(), item.is(Items.LAVA_BUCKET), item.is(BasicFluidHopper.HONEY_BUCKET.get()));
         
         FluidStack fluid = FluidStack.create(bucketItem.arch$getFluid(), FluidStack.bucketAmount());
         if (fluid.isEmpty()) return false;
@@ -234,7 +229,6 @@ public interface FluidHopper {
         if (inserted != FluidStack.bucketAmount()) return false;
 
         SoundEvent bucketEmpty;
-        BasicFluidHopper.LOGGER.info("Item {} is lava? {}, is honey? {}", item.getItem(), item.is(Items.LAVA_BUCKET), item.is(BasicFluidHopper.HONEY_BUCKET.get()));
         if (item.is(Items.LAVA_BUCKET)) {
             bucketEmpty = SoundEvents.BUCKET_EMPTY_LAVA;
         } else if (item.is(BasicFluidHopper.HONEY_BUCKET.get())) {

@@ -117,13 +117,16 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
     }
 
     public long add(FluidStack fluid, long amount, boolean simulate) {
+        BasicFluidHopper.LOGGER.info("before adding: {}", fluidStorage.getAmount());
         if (isFull()) return 0;
         long added = 0;
         try (Transaction tx = Transaction.openOuter()) {
             long inserted = fluidStorage.insert(FluidStackHooksFabric.toFabric(fluid), amount, tx);
             if (inserted == amount) added = inserted;
+            BasicFluidHopper.LOGGER.info("added: {}", added);
             if (added > 0 && !simulate) tx.commit();
         }
+        BasicFluidHopper.LOGGER.info("after adding: {}", fluidStorage.getAmount());
         return added;
     }
 

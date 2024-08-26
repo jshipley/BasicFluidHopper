@@ -2,6 +2,7 @@ package com.jship.basicfluidhopper.block.entity;
 
 import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.block.BasicFluidHopperBlock;
+import com.jship.basicfluidhopper.config.BasicFluidHopperConfig;
 import com.jship.basicfluidhopper.fluid.FluidHopper;
 import com.jship.basicfluidhopper.fluid.HopperFluidStorage;
 
@@ -22,7 +23,7 @@ public class BasicFluidHopperBlockEntity extends BlockEntity implements FluidHop
 
     public BasicFluidHopperBlockEntity(BlockPos pos, BlockState state) {
         super(BasicFluidHopper.BASIC_FLUID_HOPPER_BLOCK_ENTITY.get(), pos, state);
-        fluidStorage = HopperFluidStorage.createFluidStorage(FluidStack.bucketAmount() * BUCKET_CAPACITY, FluidStack.bucketAmount(), () -> this.markDirty());
+        fluidStorage = HopperFluidStorage.createFluidStorage(FluidStack.bucketAmount() * BasicFluidHopperConfig.BUCKET_CAPACITY, (long)(FluidStack.bucketAmount() * BasicFluidHopperConfig.MAX_TRANSFER), () -> this.markDirty());
     }
 
     @Override
@@ -56,16 +57,6 @@ public class BasicFluidHopperBlockEntity extends BlockEntity implements FluidHop
         }
         return nbt;
     }
-
-    // @Override
-    // public void load(HolderLookup.Provider registryLookup, CompoundTag nbt) {
-
-    // }
-
-    // @Override
-    // public void handleUpdateTag(HolderLookup.Provider registryLookup, CompoundTag nbt) {
-
-    // }
 
     @Override
     public HopperFluidStorage getFluidStorage() {

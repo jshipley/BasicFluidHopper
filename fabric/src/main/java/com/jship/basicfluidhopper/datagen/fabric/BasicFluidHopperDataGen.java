@@ -108,10 +108,18 @@ public class BasicFluidHopperDataGen implements DataGeneratorEntrypoint {
                 .requires(BasicFluidHopper.C_HONEY_BUCKETS)
                 .unlockedBy("has_honey_bucket", has(BasicFluidHopper.C_HONEY_BUCKETS))
                 .save(exporter, ResourceLocation.fromNamespaceAndPath(BasicFluidHopper.MOD_ID, "honey_block"));
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, BasicFluidHopper.HONEY_BUCKET.get())
+                .requires(Items.HONEY_BLOCK).requires(Items.BUCKET)
+                .unlockedBy(getHasName(Items.HONEY_BLOCK), has(Items.HONEY_BLOCK))
+                .save(exporter, ResourceLocation.fromNamespaceAndPath(BasicFluidHopper.MOD_ID, "honey_bucket_from_block"));
             ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, Items.HONEY_BOTTLE, 3)
                 .requires(BasicFluidHopper.C_HONEY_BUCKETS).requires(Items.GLASS_BOTTLE, 3)
                 .unlockedBy("has_honey_bucket", has(BasicFluidHopper.C_HONEY_BUCKETS))
-                .save(exporter, ResourceLocation.fromNamespaceAndPath(BasicFluidHopper.MOD_ID, "honey_bottles"));
+                .save(exporter, ResourceLocation.fromNamespaceAndPath(BasicFluidHopper.MOD_ID, "honey_bottles_from_bucket"));
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, Items.HONEY_BOTTLE, 3)
+                .requires(Items.HONEY_BLOCK).requires(Items.GLASS_BOTTLE, 3)
+                .unlockedBy(getHasName(Items.HONEY_BLOCK), has(Items.HONEY_BLOCK))
+                .save(exporter, ResourceLocation.fromNamespaceAndPath(BasicFluidHopper.MOD_ID, "honey_bottles_from_block"));
             ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, BasicFluidHopper.HONEY_BUCKET.get())
                 .requires(Items.BUCKET).requires(Items.HONEY_BOTTLE, 3)
                 .unlockedBy(getHasName(Items.HONEY_BOTTLE), has(Items.HONEY_BOTTLE))
