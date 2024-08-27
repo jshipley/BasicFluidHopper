@@ -1,7 +1,5 @@
 package com.jship.basicfluidhopper.util;
 
-import java.util.Optional;
-
 import org.jetbrains.annotations.Nullable;
 
 import com.jship.basicfluidhopper.BasicFluidHopper;
@@ -12,8 +10,7 @@ import dev.architectury.fluid.FluidStack;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.dispenser.BlockSource;
+import net.minecraft.core.BlockSource;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.BottleItem;
 import net.minecraft.world.item.BucketItem;
@@ -21,7 +18,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.PotionItem;
-import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -75,21 +72,21 @@ public abstract class FluidHopperUtil {
                 continue;
             }
 
-            Optional<FluidStack> hopperFluid = hopperEntity.getFluidStorage().getFluidStack();
-            if (item == null && hopperFluid.isPresent() && burnable
-                    && hopperFluid.get().getFluid().is(BasicFluidHopper.C_FLUID_FUEL)
-                    && hopperFluid.get().getAmount() >= (long)(BasicFluidHopperConfig.FUEL_CONSUME_STEP * FluidStack.bucketAmount())) {
+            FluidStack hopperFluid = hopperEntity.getFluidStorage().getFluidStack();
+            if (item == null && burnable
+                    && hopperFluid.getFluid().is(BasicFluidHopper.C_FLUID_FUEL)
+                    && hopperFluid.getAmount() >= (long)(BasicFluidHopperConfig.FUEL_CONSUME_STEP * FluidStack.bucketAmount())) {
                 // Enough fuel to power a furnace for a bit longer was found in this hopper
                 return hopperEntity;
             } else if (item.is(Items.GLASS_BOTTLE)
                     && hopperEntity.getFluidStorage().getAmount() >= FluidStack.bucketAmount() / 4
-                    && (hopperFluid.get().getFluid().isSame(Fluids.WATER) || hopperFluid.get().getFluid().is(BasicFluidHopper.C_HONEY))) {
+                    && (hopperFluid.getFluid().isSame(Fluids.WATER) || hopperFluid.getFluid().is(BasicFluidHopper.C_HONEY))) {
                 // Enough fluid that can go in a bottle was found in this hopper
                 // TODO support other mods that add additional bottled fluids
                 return hopperEntity;
             } else if (item.getItem() instanceof BucketItem bucket && bucket.arch$getFluid() == Fluids.EMPTY
-                    && hopperFluid.get().getFluid().getBucket() != null
-                    && hopperFluid.get().getAmount() >= FluidStack.bucketAmount()) {
+                    && hopperFluid.getFluid().getBucket() != null
+                    && hopperFluid.getAmount() >= FluidStack.bucketAmount()) {
                 // Enough fluid that can go in a bucket was found in this hopper
                 return hopperEntity;
             }
@@ -100,8 +97,8 @@ public abstract class FluidHopperUtil {
 
     @SuppressWarnings("deprecation")
     public static ItemStack fillDispenserItemFromHopper(ItemStack emptyItem, BlockSource dispenser) {
-        ServerLevel level = dispenser.level();
-        BlockPos pos = dispenser.pos();
+        ServerLevel level = dispenser.getLevel();
+        BlockPos pos = dispenser.getPos();
         if (emptyItem.is(Items.GLASS_BOTTLE)) {
             BasicFluidHopperBlockEntity fluidHopper = FluidHopperUtil.getHopperInsertingFluid(level, pos, level.getBlockState(pos), level.getBlockEntity(pos), false, emptyItem);
             if (fluidHopper == null) {
@@ -110,7 +107,7 @@ public abstract class FluidHopperUtil {
             long bottleAmount = FluidStack.bucketAmount() / 4;
             if (fluidHopper.getFluidStorage().getFluid().isSame(Fluids.WATER) && fluidHopper.getFluidStorage().remove(bottleAmount, true)  == bottleAmount) {
                     fluidHopper.getFluidStorage().remove(bottleAmount, false);
-                    return PotionContents.createItemStack(Items.POTION, Potions.WATER);
+                    return PotionUtils.setPotion(new ItemStack(Items.POTION), Potions.WATER);
             } else if (fluidHopper.getFluidStorage().getFluid().is(BasicFluidHopper.C_HONEY) && fluidHopper.getFluidStorage().remove(bottleAmount, true) == bottleAmount) {
                 fluidHopper.getFluidStorage().remove(bottleAmount, false);
                 return new ItemStack(Items.HONEY_BOTTLE);

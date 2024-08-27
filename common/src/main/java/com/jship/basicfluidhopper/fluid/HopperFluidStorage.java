@@ -1,14 +1,12 @@
 package com.jship.basicfluidhopper.fluid;
 
-import java.util.Optional;
-
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.VehicleEntity;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
@@ -45,7 +43,7 @@ public abstract class HopperFluidStorage {
      * @param simulate if true, only simulate the changes without updating anything
      * @return the amount of fluid that was drained (or would be drained)
      */
-    public abstract long drainVehicle(Level level, VehicleEntity vehicle, boolean simulate);
+    public abstract long drainVehicle(Level level, AbstractMinecart vehicle, boolean simulate);
 
      /**
       * Try to drain fluid from the fluid storage of an item
@@ -72,7 +70,7 @@ public abstract class HopperFluidStorage {
      * @param simulate if true, only simulate the changes without updating anything
      * @return the amount of fluid that was filled (or would be filled)
      */
-    public abstract long fillVehicle(Level level, VehicleEntity vehicle, boolean simulate);
+    public abstract long fillVehicle(Level level, AbstractMinecart vehicle, boolean simulate);
 
     /**
       * Try to fill the fluid storage of an item
@@ -103,7 +101,7 @@ public abstract class HopperFluidStorage {
      * Get the FluidStack from the fluid storage. Useful for saving the fluid NBT
      * @return a FluidStack, if it's not empty
      */
-    public abstract Optional<FluidStack> getFluidStack();
+    public abstract FluidStack getFluidStack();
 
     /**
      * Overwrite the current fluid storage with a Fluid Stack. Useful for loading the fluid NBT

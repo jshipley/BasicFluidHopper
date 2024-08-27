@@ -30,7 +30,7 @@ public class FluidHopperUtilImpl extends FluidHopperUtil {
         
             for (var view : storage) {
                 var fluidStack = FluidStack.create(view.getResource().getFluid(), view.getAmount());
-                fluidStack.applyComponents(view.getResource().getComponents());
+                // fluidStack.applyComponents(view.getResource().getComponents());
                 return fluidStack;
             }
         }

@@ -1,7 +1,5 @@
 package com.jship.basicfluidhopper.block.renderer.fabric;
 
-import java.util.Optional;
-
 import com.jship.basicfluidhopper.block.entity.BasicFluidHopperBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -17,8 +15,8 @@ public class BasicFluidHopperBlockEntityRendererImpl implements BlockEntityRende
 
     @Override
     public void render(BasicFluidHopperBlockEntity blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int light, int overlay) {
-        Optional<FluidStack> fluidStack = blockEntity.getFluidStorage().getFluidStack();
-        if (!fluidStack.isPresent() || fluidStack.get().isEmpty()) return;
+        FluidStack fluidStack = blockEntity.getFluidStorage().getFluidStack();
+        if (fluidStack.isEmpty()) return;
 
         // TODO render fluid in the hopper
     }

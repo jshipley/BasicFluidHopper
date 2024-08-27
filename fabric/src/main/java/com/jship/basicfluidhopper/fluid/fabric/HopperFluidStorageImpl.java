@@ -1,7 +1,5 @@
 package com.jship.basicfluidhopper.fluid.fabric;
 
-import java.util.Optional;
-
 import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.fluid.HopperFluidStorage;
 import com.jship.basicfluidhopper.vehicle.BasicFluidHopperMinecartEntity;
@@ -18,7 +16,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.VehicleEntity;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
@@ -64,7 +62,7 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
     }
 
     @Override
-    public long drainVehicle(Level level, VehicleEntity vehicle, boolean simulate) {
+    public long drainVehicle(Level level, AbstractMinecart vehicle, boolean simulate) {
         // given the lack of an fluid api for entities, only care about vehicles from this mod for now.
         if (vehicle instanceof BasicFluidHopperMinecartEntity hopperEntity)
             return drainFluidStorage(((HopperFluidStorageImpl)hopperEntity.getFluidStorage()).fluidStorage, simulate);
@@ -130,7 +128,7 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
     }
 
     @Override
-    public long fillVehicle(Level level, VehicleEntity vehicle, boolean simulate) {
+    public long fillVehicle(Level level, AbstractMinecart vehicle, boolean simulate) {
         // given the lack of an fluid api for entities, only care about vehicles from this mod for now.
         if (vehicle instanceof BasicFluidHopperMinecartEntity hopperEntity)
             return fillFluidStorage(((HopperFluidStorageImpl)hopperEntity.getFluidStorage()).fluidStorage, simulate);
@@ -208,7 +206,7 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
         if (fluidStorage.isResourceBlank() || fluidStorage.getAmount() <= 0)
             return false;
         FluidStack storageStack = FluidStackHooksFabric.fromFabric(fluidStorage);
-        return storageStack.isFluidEqual(fluid) && storageStack.isComponentEqual(fluid);
+        return storageStack.isFluidEqual(fluid);
     }
 
     // @Override
@@ -238,7 +236,7 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
         if (fluidStorage.isResourceBlank())
             return true;
         FluidStack storageStack = FluidStackHooksFabric.fromFabric(fluidStorage);
-        return storageStack.isFluidEqual(fluid) && storageStack.isComponentEqual(fluid);
+        return storageStack.isFluidEqual(fluid);
     }
     
     // @Override
@@ -264,8 +262,8 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
     }
 
     @Override
-    public Optional<FluidStack> getFluidStack() {
-        return fluidStorage.isResourceBlank() ? Optional.empty() : Optional.of(FluidStackHooksFabric.fromFabric(fluidStorage));
+    public FluidStack getFluidStack() {
+        return FluidStackHooksFabric.fromFabric(fluidStorage);
     }
 
     @Override

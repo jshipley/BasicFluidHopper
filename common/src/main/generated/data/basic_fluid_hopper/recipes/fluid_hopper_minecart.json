@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:minecart"
+    },
+    {
+      "item": "basic_fluid_hopper:basic_fluid_hopper"
+    }
+  ],
+  "result": {
+    "item": "basic_fluid_hopper:basic_fluid_hopper_minecart"
+  }
+}

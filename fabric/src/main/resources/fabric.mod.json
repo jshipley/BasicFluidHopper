@@ -1,44 +1,43 @@
 {
-  "schemaVersion": 1,
-  "id": "basic_fluid_hopper",
-  "version": "${version}",
-  "name": "Basic Fluid Hopper",
-  "description": "A hopper that moves fluids instead of items.",
-  "authors": [
-    "jshipley"
-  ],
-  "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
-  },
-  "license": "CC0-1.0",
-  "icon": "assets/basic_fluid_hopper/icon.png",
-  "environment": "*",
-  "entrypoints": {
-    "main": [
-      "com.jship.basicfluidhopper.fabric.BasicFluidHopperFabric"
-    ],
-    "client": [
-      "com.jship.basicfluidhopper.client.fabric.BasicFluidHopperFabricClient"
-    ],
-    "jade": [
-      "com.jship.basicfluidhopper.jade.fabric.JadePlugin"
-    ],
-    "fabric-datagen": [
-      "com.jship.basicfluidhopper.datagen.fabric.BasicFluidHopperDataGen"
-    ]
-  },
-  "mixins": [
-    "basic_fluid_hopper.mixins.json"
-  ],
-  "depends": {
-    "fabricloader": ">=0.16.0",
-    "minecraft": "1.21.*",
-    "java": ">=21",
-    "fabric-api": "*",
-    "architectury": "*"
-  },
-  "suggests": {
-    "another-mod": "*"
+	"schemaVersion": 1,
+	"id": "basic_fluid_hopper",
+	"version": "${version}",
+	"name": "Basic Fluid Hopper",
+	"description": "A hopper that moves fluids instead of items.",
+	"authors": [
+	  "jshipley"
+	],
+	"contact": {
+	  "homepage": "https://github.com/jshipley/FluidHopper",
+	  "sources": "https://github.com/jshipley/FluidHopper"
+	},
+	"license": "MIT",
+	"icon": "assets/basic_fluid_hopper/icon.png",
+	"environment": "*",
+	"entrypoints": {
+	  "main": [
+		"com.jship.basicfluidhopper.fabric.BasicFluidHopperFabric"
+	  ],
+	  "client": [
+		"com.jship.basicfluidhopper.client.fabric.BasicFluidHopperFabricClient"
+	  ],
+	  "jade": [
+		"com.jship.basicfluidhopper.jade.fabric.JadePlugin"
+	  ],
+	  "fabric-datagen": [
+		"com.jship.basicfluidhopper.datagen.fabric.BasicFluidHopperDataGen"
+	  ]
+	},
+	"mixins": [
+	  "basic_fluid_hopper.mixins.json"
+	],
+	"accessWidener": "basic_fluid_hopper.accesswidener",
+	"depends": {
+	  "fabricloader": ">=0.16.0",
+	  "minecraft": "1.20.1",
+	  "java": ">=17",
+	  "fabric-api": "*",
+	  "architectury": "*"
+	}
   }
-}
+  

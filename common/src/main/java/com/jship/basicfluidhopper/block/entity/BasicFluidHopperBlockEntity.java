@@ -15,8 +15,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.Optional;
-
 public class BasicFluidHopperBlockEntity extends BlockEntity implements FluidHopper {
     public final HopperFluidStorage fluidStorage;
     private int transferCooldown = -1;
@@ -27,34 +25,29 @@ public class BasicFluidHopperBlockEntity extends BlockEntity implements FluidHop
     }
 
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
+    public void load(CompoundTag nbt) {
+        super.load(nbt);
         if (nbt.contains("fluid_stack")) {
             CompoundTag fluidStack = nbt.getCompound("fluid_stack");
-            Optional<FluidStack> fluid = FluidStack.read(registryLookup, fluidStack);
-            if (fluid.isPresent())
-                fluidStorage.setFluidStack(fluid.get());
+            FluidStack fluid = FluidStack.read(fluidStack);
+            fluidStorage.setFluidStack(fluid);
         }
         this.transferCooldown = nbt.getInt("transfer_cooldown");
     }
 
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        Optional<FluidStack> fluid = fluidStorage.getFluidStack();
-        if (fluid.isPresent()) {
-            nbt.put("fluid_stack", fluid.get().write(registryLookup, new CompoundTag()));
-        }
+    protected void saveAdditional(CompoundTag nbt) {
+        super.saveAdditional(nbt);
+        FluidStack fluid = fluidStorage.getFluidStack();
+        nbt.put("fluid_stack", fluid.write(new CompoundTag()));
         nbt.putInt("transfer_cooldown", this.transferCooldown);
     }
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registryLookup) {
-        CompoundTag nbt = super.getUpdateTag(registryLookup);
-        Optional<FluidStack> fluid = fluidStorage.getFluidStack();
-        if (fluid.isPresent()) {
-            nbt.put("fluid_stack", fluid.get().write(registryLookup, new CompoundTag()));
-        }
+    public CompoundTag getUpdateTag() {
+        CompoundTag nbt = super.getUpdateTag();
+        FluidStack fluid = fluidStorage.getFluidStack();
+        nbt.put("fluid_stack", fluid.write(new CompoundTag()));
         return nbt;
     }
 

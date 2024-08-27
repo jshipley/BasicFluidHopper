@@ -1,7 +1,6 @@
 package com.jship.basicfluidhopper.fluid;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.config.BasicFluidHopperConfig;
@@ -15,10 +14,9 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.VehicleEntity;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -75,29 +73,29 @@ public interface FluidHopper {
         return false;
     }
 
-    public static ItemInteractionResult useFluidItem(Level level, Player player, InteractionHand hand, FluidHopper fluidHopper) {
-        if (level.isClientSide) return ItemInteractionResult.SUCCESS;
+    public static InteractionResult useFluidItem(Level level, Player player, InteractionHand hand, FluidHopper fluidHopper) {
+        if (level.isClientSide) return InteractionResult.SUCCESS;
 
         ItemStack item = player.getItemInHand(hand);
 		if (FluidHopperUtil.isFluidItem(item)) {
 			FluidStack playerFluid = FluidHopperUtil.getFluidFromItem(item);
-			Optional<FluidStack> storageFluid = fluidHopper.getFluidStorage().getFluidStack();
-			if (storageFluid.isPresent() && !storageFluid.isEmpty()) {
+			FluidStack storageFluid = fluidHopper.getFluidStorage().getFluidStack();
+			if (!storageFluid.isEmpty()) {
 				long filled = fluidHopper.getFluidStorage().fillItem(player, hand, true);
 				if (filled > 0) {
 					fluidHopper.getFluidStorage().fillItem(player, hand, false);
-					return ItemInteractionResult.SUCCESS;
+					return InteractionResult.SUCCESS;
 				}
-				return ItemInteractionResult.CONSUME;
+				return InteractionResult.CONSUME;
 			} else if (!fluidHopper.getFluidStorage().isFull() && !playerFluid.isEmpty()) {
 				long drained = fluidHopper.getFluidStorage().drainItem(player, hand, true);
 				if (drained > 0) {
 					fluidHopper.getFluidStorage().drainItem(player, hand, false);
-					return ItemInteractionResult.SUCCESS;
+					return InteractionResult.SUCCESS;
 				}
 			}
 		}
-		return ItemInteractionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
     /**
@@ -124,12 +122,12 @@ public interface FluidHopper {
      * @param pos the block position to search
      * @return a list of vehicle entities
      */
-    public static List<VehicleEntity> getVehicles(Level level, BlockPos pos) {
+    public static List<AbstractMinecart> getVehicles(Level level, BlockPos pos) {
         return level.getEntities((Entity) null, new AABB(
             pos.getX() - 0.5, pos.getY() - 0.5, pos.getZ() - 0.5,
             pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5)).stream()
-                .filter((entity) -> entity instanceof VehicleEntity)
-                .map((entity) -> (VehicleEntity)entity)
+                .filter((entity) -> entity instanceof AbstractMinecart)
+                .map((entity) -> (AbstractMinecart)entity)
                 .toList();
     }
 
@@ -149,7 +147,7 @@ public interface FluidHopper {
         }
 
         // Try to fill any vehicle in the facing block
-        for (VehicleEntity vehicle : getVehicles(level, pos.relative(fluidHopper.getFacing()))) {
+        for (AbstractMinecart vehicle : getVehicles(level, pos.relative(fluidHopper.getFacing()))) {
             filled = fluidHopper.getFluidStorage().fillVehicle(level, vehicle, true);
             if (filled > 0) {
                 fluidHopper.getFluidStorage().fillVehicle(level, vehicle, false);
@@ -197,7 +195,7 @@ public interface FluidHopper {
                 FluidStack fluid = FluidStack.create(aboveFluidState.getType(), FluidStack.bucketAmount());
                 long inserted = fluidHopper.getFluidStorage().add(fluid, FluidStack.bucketAmount(), true);
                 if (inserted == FluidStack.bucketAmount()) {
-                    ItemStack bucket = bucketPickup.pickupBlock(null, level, pos.above(), aboveState);
+                    ItemStack bucket = bucketPickup.pickupBlock(level, pos.above(), aboveState);
                     if (!bucket.isEmpty()) {
                         fluidHopper.getFluidStorage().add(fluid, FluidStack.bucketAmount(), false);
                         return true;
@@ -207,7 +205,7 @@ public interface FluidHopper {
         }
 
         // Try to drain any vehicle in the above block
-        for (VehicleEntity vehicle : FluidHopper.getVehicles(level, pos.above())) {
+        for (AbstractMinecart vehicle : FluidHopper.getVehicles(level, pos.above())) {
             drained = fluidHopper.getFluidStorage().drainVehicle(level, vehicle, true);
             if (drained > 0) {
                 fluidHopper.getFluidStorage().drainVehicle(level, vehicle, false);
@@ -220,17 +218,15 @@ public interface FluidHopper {
 
     public static boolean tryFillBucket(ItemStack item, Level level, BlockPos pos, Player player, InteractionHand hand, HopperFluidStorage fluidStorage) {
         if (fluidStorage.isEmpty()) return false;
-        Optional<FluidStack> fluid = fluidStorage.getFluidStack();
-        if (!fluid.isPresent()) return false;
-
+        FluidStack fluid = fluidStorage.getFluidStack();
         long removed = fluidStorage.remove(FluidStack.bucketAmount(), true);
         if (removed != FluidStack.bucketAmount()) return false;
 
-        Item bucket = fluid.get().getFluid().getBucket();
+        Item bucket = fluid.getFluid().getBucket();
         ItemStack emptyBucket = player.getItemInHand(hand);
         if (bucket != Items.AIR && emptyBucket.is(Items.BUCKET)) {
             ItemStack bucketStack = new ItemStack(bucket);
-            bucketStack.applyComponents(emptyBucket.getComponents());
+            bucketStack.setTag(emptyBucket.getTag());
             player.setItemInHand(hand, ItemUtils.createFilledResult(item, player, bucketStack));
             SoundEvent pickupSound;
             if (bucket == Items.LAVA_BUCKET) {
@@ -269,7 +265,6 @@ public interface FluidHopper {
         level.gameEvent(null, GameEvent.FLUID_PLACE, pos);
         
         ItemStack emptyBucket = new ItemStack(Items.BUCKET);
-        emptyBucket.applyComponents(bucketItem.components());
         player.setItemInHand(hand, ItemUtils.createFilledResult(item, player, emptyBucket));
         fluidStorage.add(fluid, FluidStack.bucketAmount(), false);
         

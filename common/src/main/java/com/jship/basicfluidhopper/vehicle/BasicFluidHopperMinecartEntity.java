@@ -1,7 +1,5 @@
 package com.jship.basicfluidhopper.vehicle;
 
-import java.util.Optional;
-
 import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.config.BasicFluidHopperConfig;
 import com.jship.basicfluidhopper.fluid.FluidHopper;
@@ -102,7 +100,7 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 	@SuppressWarnings("resource")
 	@Override
 	public InteractionResult interact(Player player, InteractionHand hand) {
-		return FluidHopper.useFluidItem(this.level(), player, hand, (FluidHopper)this).result();
+		return FluidHopper.useFluidItem(this.level(), player, hand, (FluidHopper)this);
 	}
 
 	@Override
@@ -115,12 +113,6 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 	}
 
 	@Override
-	// Overriding destroy because for some reason getDropItem wasn't being recognized
-	protected void destroy(DamageSource source) {
-        this.destroy(this.getDropItem());
-    }
-
-	@Override
 	public ItemStack getPickResult() {
 		return new ItemStack(BasicFluidHopper.BASIC_FLUID_HOPPER_MINECART_ITEM.get());
 	}
@@ -130,11 +122,11 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 		super.addAdditionalSaveData(nbt);
 		nbt.putBoolean("enabled", this.enabled);
 		CompoundTag jadeData = new CompoundTag();
-		Optional<FluidStack> fluid = fluidStorage.getFluidStack();
-		if (fluid.isPresent()) {
-			nbt.put("fluid_stack", fluid.get().write(registryAccess(), new CompoundTag()));
-			jadeData.putLong("amount", fluid.get().getAmount());
-			jadeData.putString("type", fluid.get().getFluid().arch$registryName().getNamespace() + ":" + fluid.get().getFluid().arch$registryName().getPath());
+		FluidStack fluid = fluidStorage.getFluidStack();
+		if (!fluid.isEmpty()) {
+			nbt.put("fluid_stack", fluid.write(new CompoundTag()));
+			jadeData.putLong("amount", fluid.getAmount());
+			jadeData.putString("type", fluid.getFluid().arch$registryName().getNamespace() + ":" + fluid.getFluid().arch$registryName().getPath());
 		} else {
 			jadeData.putLong("amount", 0L);
 			jadeData.putString("type", FluidStack.empty().getFluid().arch$registryName().getNamespace() + ":" + FluidStack.empty().getFluid().arch$registryName().getPath());
@@ -149,9 +141,8 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 		this.enabled = nbt.contains("enabled") ? nbt.getBoolean("enabled") : true;
 		if (nbt.contains("fluid_stack")) {
 			CompoundTag fluidStack = nbt.getCompound("fluid_stack");
-			Optional<FluidStack> fluid = FluidStack.read(registryAccess(), fluidStack);
-			if (fluid.isPresent())
-				fluidStorage.setFluidStack(fluid.get());
+			FluidStack fluid = FluidStack.read(fluidStack);
+			fluidStorage.setFluidStack(fluid);
 		}
 	}
 
