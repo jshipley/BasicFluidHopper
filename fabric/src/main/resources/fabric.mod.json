@@ -34,8 +34,8 @@
 	"accessWidener": "basic_fluid_hopper.accesswidener",
 	"depends": {
 	  "fabricloader": ">=0.16.0",
-	  "minecraft": "1.20.1",
-	  "java": ">=17",
+	  "minecraft": "1.19.2",
+	  "java": ">=16",
 	  "fabric-api": "*",
 	  "architectury": "*"
 	}

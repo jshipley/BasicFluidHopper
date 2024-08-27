@@ -72,7 +72,8 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
     private long drainFluidStorage(Storage<FluidVariant> sourceStorage, boolean simulate) {        
         long drained = 0;
         try (var tx = Transaction.openOuter()) {
-            for (var view : sourceStorage.nonEmptyViews()) {
+            for (var view : sourceStorage) {
+                if (view.isResourceBlank()) continue;
                 try (var nestedTx = tx.openNested()) {
                     FluidVariant resource = fluidStorage.isResourceBlank() ? view.getResource() : fluidStorage.getResource();
                     long maxExtract = Math.min(this.transferRate, fluidStorage.getCapacity() - fluidStorage.getAmount());
@@ -98,7 +99,8 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
         if (isFull() || itemStorage == null) return drained;
 
         try (var tx = Transaction.openOuter()) {
-            for (var view : itemStorage.nonEmptyViews()) {
+            for (var view : itemStorage) {
+                if (view.isResourceBlank()) continue;
                 try (var nestedTx = tx.openNested()) {
                     FluidVariant resource = fluidStorage.isResourceBlank() ? view.getResource() : fluidStorage.getResource();
                     long containerAmount = view.getAmount();

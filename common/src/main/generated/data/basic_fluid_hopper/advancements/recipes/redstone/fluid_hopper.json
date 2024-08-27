@@ -30,6 +30,5 @@
     "recipes": [
       "basic_fluid_hopper:fluid_hopper"
     ]
-  },
-  "sends_telemetry_event": false
+  }
 }

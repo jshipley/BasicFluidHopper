@@ -28,6 +28,5 @@
     "recipes": [
       "basic_fluid_hopper:honey_block"
     ]
-  },
-  "sends_telemetry_event": false
+  }
 }

@@ -16,7 +16,6 @@ import snownee.jade.api.view.FluidView;
 import snownee.jade.api.view.IClientExtensionProvider;
 import snownee.jade.api.view.IServerExtensionProvider;
 import snownee.jade.api.view.ViewGroup;
-import snownee.jade.util.JadeFabricUtils;
 
 public enum HopperMinecartFluidStorageProvider implements IServerExtensionProvider<BasicFluidHopperMinecartEntity, CompoundTag>, IClientExtensionProvider<CompoundTag, FluidView> {
     INSTANCE;
@@ -30,11 +29,11 @@ public enum HopperMinecartFluidStorageProvider implements IServerExtensionProvid
 
     @Override
     public List<ClientViewGroup<FluidView>> getClientGroups(Accessor<?> accessor, List<ViewGroup<CompoundTag>> groups) {
-        return ClientViewGroup.map(groups, FluidView::readDefault, null);
+        return ClientViewGroup.map(groups, FluidView::read, null);
     }
 
     @Override
     public List<ViewGroup<CompoundTag>> getGroups(ServerPlayer player, ServerLevel level, BasicFluidHopperMinecartEntity entity, boolean showDetails) {
-        return JadeFabricUtils.fromFluidStorage(((HopperFluidStorageImpl)entity.getFluidStorage()).getFluidStorage());
+        return FluidView.fromStorage(((HopperFluidStorageImpl)entity.getFluidStorage()).getFluidStorage());
     }
 }

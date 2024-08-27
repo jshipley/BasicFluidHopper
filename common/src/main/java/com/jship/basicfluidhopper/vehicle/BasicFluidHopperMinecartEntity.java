@@ -88,19 +88,19 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 	@Override
 	public void tick() {
 		super.tick();
-		if (!this.level().isClientSide && this.isAlive() && this.isEnabled() && this.canOperate()) {
+		if (!this.getLevel().isClientSide && this.isAlive() && this.isEnabled() && this.canOperate()) {
 			this.markDirty();
 		}
 	}
 
 	public boolean canOperate() {
-		return FluidHopper.drain(this.level(), this.getOnPos(), this);
+		return FluidHopper.drain(this.getLevel(), this.getOnPos(), this);
 	}
 
 	@SuppressWarnings("resource")
 	@Override
 	public InteractionResult interact(Player player, InteractionHand hand) {
-		return FluidHopper.useFluidItem(this.level(), player, hand, (FluidHopper)this);
+		return FluidHopper.useFluidItem(this.getLevel(), player, hand, (FluidHopper)this);
 	}
 
 	@Override

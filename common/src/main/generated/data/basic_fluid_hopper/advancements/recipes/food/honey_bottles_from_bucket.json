@@ -28,6 +28,5 @@
     "recipes": [
       "basic_fluid_hopper:honey_bottles_from_bucket"
     ]
-  },
-  "sends_telemetry_event": false
+  }
 }

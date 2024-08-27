@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "B": {
       "item": "minecraft:bucket"
@@ -16,6 +15,5 @@
   ],
   "result": {
     "item": "basic_fluid_hopper:basic_fluid_hopper"
-  },
-  "show_notification": true
+  }
 }

@@ -30,6 +30,5 @@
     "recipes": [
       "basic_fluid_hopper:empty_bottles"
     ]
-  },
-  "sends_telemetry_event": false
+  }
 }

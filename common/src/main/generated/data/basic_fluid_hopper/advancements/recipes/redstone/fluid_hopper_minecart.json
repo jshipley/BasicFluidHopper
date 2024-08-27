@@ -35,6 +35,5 @@
     "recipes": [
       "basic_fluid_hopper:fluid_hopper_minecart"
     ]
-  },
-  "sends_telemetry_event": false
+  }
 }
