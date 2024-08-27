@@ -1,7 +1,6 @@
 package com.jship.basicfluidhopper.datagen.fabric;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 
 import com.jship.basicfluidhopper.BasicFluidHopper;
 

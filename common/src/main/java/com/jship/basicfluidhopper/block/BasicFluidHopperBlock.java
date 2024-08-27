@@ -3,6 +3,7 @@ package com.jship.basicfluidhopper.block;
 import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.block.entity.BasicFluidHopperBlockEntity;
 import com.jship.basicfluidhopper.fluid.FluidHopper;
+import com.jship.basicfluidhopper.util.FluidHopperUtil;
 import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
@@ -150,26 +151,7 @@ public class BasicFluidHopperBlock extends BaseEntityBlock {
 	@Override
 	protected ItemInteractionResult useItemOn(ItemStack item, BlockState state, Level level, BlockPos pos,
 			Player player, InteractionHand hand, BlockHitResult hit) {
-		if (level.isClientSide) {
-			return ItemInteractionResult.SUCCESS;
-		} else {
-			BlockEntity blockEntity = level.getBlockEntity(pos);
-			if (blockEntity instanceof BasicFluidHopperBlockEntity) {
-				boolean success = false;
-				if (item.is(Items.BUCKET)) {
-						success |= FluidHopper.tryFillBucket(item, level, pos, player, hand,
-								((BasicFluidHopperBlockEntity) blockEntity).fluidStorage);
-				} else if (item.getItem() instanceof BucketItem) {
-						success |= FluidHopper.tryDrainBucket(item, level, pos, player,
-								hand, ((BasicFluidHopperBlockEntity) blockEntity).fluidStorage);
-					}
-				}
-				if (success) {
-					return ItemInteractionResult.CONSUME;
-				}
-			}
-			return ItemInteractionResult.SUCCESS;
-		}
+		return FluidHopper.useFluidItem(level, player, hand, (FluidHopper)level.getBlockEntity(pos));
 	}
 
 	@Override

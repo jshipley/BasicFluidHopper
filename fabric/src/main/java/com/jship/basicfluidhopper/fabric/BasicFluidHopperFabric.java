@@ -12,5 +12,6 @@ public class BasicFluidHopperFabric implements ModInitializer {
                 BasicFluidHopper.init();
 
                 FluidStorage.SIDED.registerForBlockEntity((tank, direction) -> ((HopperFluidStorageImpl)tank.fluidStorage).getFluidStorage(), BasicFluidHopper.BASIC_FLUID_HOPPER_BLOCK_ENTITY.get());
+                // FluidStorage.ITEM.registerForItems(ItemApiProvider<Storage<FluidVariant>>, );
         }
 }

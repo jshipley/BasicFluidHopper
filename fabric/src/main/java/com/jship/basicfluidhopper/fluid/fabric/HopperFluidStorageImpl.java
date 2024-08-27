@@ -8,6 +8,7 @@ import com.jship.basicfluidhopper.vehicle.BasicFluidHopperMinecartEntity;
 
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.fabric.FluidStackHooksFabric;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -15,7 +16,10 @@ import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.VehicleEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 
@@ -69,22 +73,50 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
     
     private long drainFluidStorage(Storage<FluidVariant> sourceStorage, boolean simulate) {        
         long drained = 0;
-        try (Transaction tx = Transaction.openOuter()) {
+        try (var tx = Transaction.openOuter()) {
             for (var view : sourceStorage.nonEmptyViews()) {
-                try (Transaction nestedTx = tx.openNested()) {
+                try (var nestedTx = tx.openNested()) {
                     FluidVariant resource = fluidStorage.isResourceBlank() ? view.getResource() : fluidStorage.getResource();
                     long maxExtract = Math.min(this.transferRate, fluidStorage.getCapacity() - fluidStorage.getAmount());
                     long extracted = view.extract(resource, maxExtract, nestedTx);
                     long inserted = fluidStorage.insert(resource, extracted, nestedTx);
                     if (extracted == inserted) {
                         drained = extracted;
-                        nestedTx.commit();
+                        if (!simulate)
+                            nestedTx.commit();
                         // Only extract from one storage per tick
                         break;
                     }
                 }
             }
             if (drained > 0 && !simulate) tx.commit();
+        }
+        return drained;
+    }
+
+    public long drainItem(Player player, InteractionHand hand, boolean simulate) {
+        long drained = 0;
+        Storage<FluidVariant> itemStorage = FluidStorage.ITEM.find(player.getItemInHand(hand), ContainerItemContext.forPlayerInteraction(player, hand));
+        if (isFull() || itemStorage == null) return drained;
+
+        try (var tx = Transaction.openOuter()) {
+            for (var view : itemStorage.nonEmptyViews()) {
+                try (var nestedTx = tx.openNested()) {
+                    FluidVariant resource = fluidStorage.isResourceBlank() ? view.getResource() : fluidStorage.getResource();
+                    long containerAmount = view.getAmount();
+                    long maxExtract = Math.min(this.transferRate, view.getCapacity());
+                    long extracted = view.extract(resource, maxExtract, nestedTx);
+                    long inserted = fluidStorage.insert(resource, extracted, nestedTx);
+                    if (extracted == inserted && extracted > 0 && (extracted == containerAmount || view.getCapacity() > FluidStack.bucketAmount())) {
+                        drained = extracted;
+                        if (!simulate) {
+                            nestedTx.commit();
+                            tx.commit();
+                        }
+                        break;
+                    } 
+                }
+            }
         }
         return drained;
     }
@@ -107,7 +139,7 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
 
     public long fillFluidStorage(Storage<FluidVariant> destStorage, boolean simulate) {
         long filled = 0;
-        try (Transaction tx = Transaction.openOuter()) {
+        try (var tx = Transaction.openOuter()) {
             FluidVariant resource = fluidStorage.getResource();
             long extracted = fluidStorage.extract(resource, transferRate, tx);
             long inserted = destStorage.insert(resource, extracted, tx);
@@ -117,23 +149,43 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
         return filled;
     }
 
+    public long fillItem(Player player, InteractionHand hand, boolean simulate) {
+        long filled = 0;
+        Storage<FluidVariant> itemStorage = FluidStorage.ITEM.find(
+            player.getItemInHand(hand), player.isCreative() ? ContainerItemContext.forCreativeInteraction(player, player.getItemInHand(hand))
+                                                            : ContainerItemContext.forPlayerInteraction(player, hand));
+        if (isEmpty() || itemStorage == null) return filled;
+
+        try (var tx = Transaction.openOuter()) {
+            FluidVariant resource = fluidStorage.getResource();
+            long maxExtract = Math.min(this.transferRate, fluidStorage.getAmount());
+            long inserted = itemStorage.insert(resource, maxExtract, tx);
+            long extracted = fluidStorage.extract(resource, inserted, tx);
+            long itemStorageCapacity = itemStorage.iterator().next().getCapacity();
+            if (inserted == extracted && (inserted == itemStorageCapacity || itemStorageCapacity > FluidStack.bucketAmount())) {
+                filled = inserted;
+                if (!simulate)
+                    tx.commit();
+            }
+        }
+        return filled;
+    }
+
     public long add(FluidStack fluid, long amount, boolean simulate) {
         if (isFull()) return 0;
         long added = 0;
-        try (Transaction tx = Transaction.openOuter()) {
+        try (var tx = Transaction.openOuter()) {
             long inserted = fluidStorage.insert(FluidStackHooksFabric.toFabric(fluid), amount, tx);
             if (inserted == amount) added = inserted;
-            BasicFluidHopper.LOGGER.info("added: {}", added);
             if (added > 0 && !simulate) tx.commit();
         }
-        BasicFluidHopper.LOGGER.info("after adding: {}", fluidStorage.getAmount());
         return added;
     }
 
     public long remove(long amount, boolean simulate) {
         if (isEmpty()) return 0;
         long removed = 0;
-        try (Transaction tx = Transaction.openOuter()) {
+        try (var tx = Transaction.openOuter()) {
             long extracted = fluidStorage.extract(fluidStorage.getResource(), amount, tx);
             if (extracted == amount) removed = extracted;
             if (removed > 0 && !simulate) tx.commit();
@@ -162,7 +214,7 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
     // @Override
     public long extractFluid(FluidStack fluid, long maxExtract, boolean simulate) {
         long extracted = 0;
-        try (Transaction tx = Transaction.openOuter()) {
+        try (var tx = Transaction.openOuter()) {
             extracted = fluidStorage.extract(FluidStackHooksFabric.toFabric(fluid), Math.min(maxExtract, this.transferRate), tx);
             if (extracted > 0 && !simulate)
                 tx.commit();
@@ -173,7 +225,7 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
     // @Override
     public long extractFluid(HopperFluidStorage destStorage, long maxExtract, boolean simulate) {
         long extracted = 0;
-        try (Transaction tx = Transaction.openOuter()) {
+        try (var tx = Transaction.openOuter()) {
             extracted = this.fluidStorage.extract(((HopperFluidStorageImpl)destStorage).fluidStorage.getResource(), maxExtract, tx);
             if (extracted > 0 && !simulate)
                 tx.commit();
@@ -192,7 +244,7 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
     // @Override
     public long insertFluid(FluidStack fluid, long maxInsert, boolean simulate) {
         long inserted = 0;
-        try (Transaction tx = Transaction.openOuter()) {
+        try (var tx = Transaction.openOuter()) {
             inserted = fluidStorage.insert(FluidStackHooksFabric.toFabric(fluid), Math.min(maxInsert, this.transferRate), tx);
             if (inserted > 0 && !simulate)
                 tx.commit();
@@ -203,7 +255,7 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
     // @Override
     public long insertFluid(HopperFluidStorage sourceStorage, long maxInsert, boolean simulate) {
         long inserted = 0;
-        try (Transaction tx = Transaction.openOuter()) {
+        try (var tx = Transaction.openOuter()) {
             inserted = fluidStorage.insert(((HopperFluidStorageImpl)sourceStorage).fluidStorage.getResource(), Math.min(maxInsert, this.transferRate), tx);
             if (inserted > 0 && !simulate)
                 tx.commit();

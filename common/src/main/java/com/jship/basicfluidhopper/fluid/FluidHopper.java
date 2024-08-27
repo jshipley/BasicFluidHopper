@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.config.BasicFluidHopperConfig;
+import com.jship.basicfluidhopper.util.FluidHopperUtil;
 
 import dev.architectury.fluid.FluidStack;
 import net.minecraft.core.BlockPos;
@@ -13,6 +14,8 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.VehicleEntity;
@@ -71,6 +74,31 @@ public interface FluidHopper {
         }
         return false;
     }
+
+    public static ItemInteractionResult useFluidItem(Level level, Player player, InteractionHand hand, FluidHopper fluidHopper) {
+        if (level.isClientSide) return ItemInteractionResult.SUCCESS;
+
+        ItemStack item = player.getItemInHand(hand);
+		if (FluidHopperUtil.isFluidItem(item)) {
+			FluidStack playerFluid = FluidHopperUtil.getFluidFromItem(item);
+			Optional<FluidStack> storageFluid = fluidHopper.getFluidStorage().getFluidStack();
+			if (storageFluid.isPresent() && !storageFluid.isEmpty()) {
+				long filled = fluidHopper.getFluidStorage().fillItem(player, hand, true);
+				if (filled > 0) {
+					fluidHopper.getFluidStorage().fillItem(player, hand, false);
+					return ItemInteractionResult.SUCCESS;
+				}
+				return ItemInteractionResult.CONSUME;
+			} else if (!fluidHopper.getFluidStorage().isFull() && !playerFluid.isEmpty()) {
+				long drained = fluidHopper.getFluidStorage().drainItem(player, hand, true);
+				if (drained > 0) {
+					fluidHopper.getFluidStorage().drainItem(player, hand, false);
+					return ItemInteractionResult.SUCCESS;
+				}
+			}
+		}
+		return ItemInteractionResult.SUCCESS;
+	}
 
     /**
      * Reduce the fluid stored in the hopper without inserting it anywhere

@@ -9,6 +9,7 @@ import com.jship.basicfluidhopper.block.entity.BasicFluidHopperBlockEntity;
 import com.jship.basicfluidhopper.config.BasicFluidHopperConfig;
 
 import dev.architectury.fluid.FluidStack;
+import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
@@ -28,38 +29,26 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 
-public class FluidHopperUtil {
-    public static FluidStack getFluidFromItem(ItemStack filledContainer) {
-        if (filledContainer.getItem() instanceof BucketItem bucket) {
-            BasicFluidHopper.LOGGER.info("It's a bucket!");
-            return FluidStack.create(bucket.arch$getFluid(), FluidStack.bucketAmount());
-        } else if (filledContainer.is(Items.HONEY_BOTTLE) ) {
-            return FluidStack.create(BasicFluidHopper.HONEY_FLUID.get(), FluidStack.bucketAmount() / 4);
-        } else if (filledContainer.is(Items.POTION) && filledContainer.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).is(Potions.WATER)) {
-            return FluidStack.create(Fluids.WATER, FluidStack.bucketAmount() / 4);
-        }
-        return FluidStack.empty();
+public abstract class FluidHopperUtil {
+
+    @ExpectPlatform
+    public static boolean isFluidItem(ItemStack container) {
+        throw new AssertionError();
     }
 
-    @SuppressWarnings("deprecation")
+    @ExpectPlatform
+    public static long getFluidItemCapacity(ItemStack container) {
+        throw new AssertionError();
+    }
+
+    @ExpectPlatform
+    public static FluidStack getFluidFromItem(ItemStack filledContainer) {
+        throw new AssertionError();
+    }
+
+    @ExpectPlatform
     public static ItemStack getItemFromFluid(FluidStack fluid, ItemStack container) {
-        if (container.getItem() instanceof BucketItem bucket || container.getItem() == Items.BUCKET) {
-            BasicFluidHopper.LOGGER.info("It's a bucket but not checking fluid");
-        } else {
-            BasicFluidHopper.LOGGER.info("item? {} - {}", container.getItem(), container.getItem().arch$registryName());
-        }
-        if (container.getItem() instanceof BucketItem bucket && bucket.arch$getFluid() == Fluids.EMPTY) {
-            if (!fluid.isEmpty() && fluid.getAmount() >= FluidStack.bucketAmount()) {
-                return new ItemStack(fluid.getFluid().getBucket());
-            }
-        } else if (container.is(Items.GLASS_BOTTLE)) {
-            if (fluid.getFluid().is(BasicFluidHopper.C_HONEY)) {
-                return new ItemStack(Items.HONEY_BOTTLE);
-            } else if (fluid.getFluid().isSame(Fluids.WATER)) {
-                return Items.POTION.getDefaultInstance();
-            }
-        }
-        return ItemStack.EMPTY;
+        throw new AssertionError();
     }
 
     @SuppressWarnings("deprecation")

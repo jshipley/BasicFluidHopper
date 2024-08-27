@@ -102,22 +102,7 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 	@SuppressWarnings("resource")
 	@Override
 	public InteractionResult interact(Player player, InteractionHand hand) {
-		if (this.level().isClientSide) return InteractionResult.SUCCESS;
-
-		ItemStack item = player.getItemInHand(hand);
-		if (item.is(Items.BUCKET)) {
-				return FluidHopper.tryFillBucket(item, getCommandSenderWorld(), blockPosition(), player, hand,
-						fluidStorage) ? InteractionResult.CONSUME : InteractionResult.SUCCESS;
-		} else if (item.getItem() instanceof BucketItem) {
-				return FluidHopper.tryDrainBucket(item, getCommandSenderWorld(), blockPosition(), player, hand,
-						fluidStorage) ? InteractionResult.CONSUME : InteractionResult.SUCCESS;
-			}
-		} else {
-			BasicFluidHopper.LOGGER.info("Fluid from item: {}", FluidHopperUtil.getFluidFromItem(player.getItemInHand(hand)).getFluid().arch$registryName());
-			if (fluidStorage.getFluidStack().isPresent())
-				BasicFluidHopper.LOGGER.info("Item from fluid: {}", FluidHopperUtil.getItemFromFluid(fluidStorage.getFluidStack().get(), player.getItemInHand(hand)));
-		}
-		return InteractionResult.SUCCESS;
+		return FluidHopper.useFluidItem(this.level(), player, hand, (FluidHopper)this).result();
 	}
 
 	@Override
