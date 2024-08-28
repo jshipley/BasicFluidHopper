@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_honey_bucket": {
+    "has_honey_bottle": {
       "conditions": {
         "items": [
           {
-            "items": "#c:buckets/honey"
+            "items": "minecraft:honey_bottle"
           }
         ]
       },
@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "basic_fluid_hopper:honey_block"
+        "recipe": "basic_fluid_hopper:honey_bucket_from_bottles"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -21,12 +21,12 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_honey_bucket"
+      "has_honey_bottle"
     ]
   ],
   "rewards": {
     "recipes": [
-      "basic_fluid_hopper:honey_block"
+      "basic_fluid_hopper:honey_bucket_from_bottles"
     ]
   }
 }
