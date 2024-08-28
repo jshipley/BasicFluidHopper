@@ -80,22 +80,36 @@ public interface FluidHopper {
 		if (FluidHopperUtil.isFluidItem(item)) {
 			FluidStack playerFluid = FluidHopperUtil.getFluidFromItem(item);
 			FluidStack storageFluid = fluidHopper.getFluidStorage().getFluidStack();
-			if (!storageFluid.isEmpty()) {
-				long filled = fluidHopper.getFluidStorage().fillItem(player, hand, true);
-				if (filled > 0) {
-					fluidHopper.getFluidStorage().fillItem(player, hand, false);
-					return InteractionResult.SUCCESS;
-				}
-				return InteractionResult.CONSUME;
-			} else if (!fluidHopper.getFluidStorage().isFull() && !playerFluid.isEmpty()) {
-				long drained = fluidHopper.getFluidStorage().drainItem(player, hand, true);
-				if (drained > 0) {
-					fluidHopper.getFluidStorage().drainItem(player, hand, false);
-					return InteractionResult.SUCCESS;
-				}
-			}
-		}
-		return InteractionResult.SUCCESS;
+
+            // item is empty
+            if (playerFluid.isEmpty()) {
+                long filled = fluidHopper.getFluidStorage().fillItem(player, hand, true);
+                if (filled > 0) {
+                    fluidHopper.getFluidStorage().fillItem(player, hand, false);
+                    return InteractionResult.SUCCESS;
+                }
+            // hopper can hold more
+            } else if (storageFluid.getAmount() < fluidHopper.getFluidStorage().getMaxAmount()) {
+                long drained = fluidHopper.getFluidStorage().drainItem(player, hand, true);
+                if (drained > 0) {
+                    fluidHopper.getFluidStorage().drainItem(player, hand, false);
+                    return InteractionResult.SUCCESS;
+                }
+            // hopper is full, try to drain it
+            // this will fail for buckets/bottles, but could still succeed for tanks
+            } else if (storageFluid.getAmount() >= fluidHopper.getFluidStorage().getMaxAmount()) {
+                long filled = fluidHopper.getFluidStorage().fillItem(player, hand, true);
+                if (filled > 0) {
+                    fluidHopper.getFluidStorage().fillItem(player, hand, false);
+                    return InteractionResult.SUCCESS;
+                }
+            }
+            // It is a fluid item that should interact with the hopper, but none of the available actions succeeded.
+            return InteractionResult.CONSUME;
+        }
+
+        // Not a fluid item, let the block handle the rest
+		return InteractionResult.PASS;
 	}
 
     /**

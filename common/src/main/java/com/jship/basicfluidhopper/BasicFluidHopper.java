@@ -89,8 +89,10 @@ public class BasicFluidHopper {
                         .density(3000).viscosity(4000).dropOff(2).tickDelay(60)
                         .color(0xCCFED167)
                         .emptySound(SoundEvents.BEEHIVE_DRIP).fillSound(SoundEvents.BEEHIVE_DRIP)
-                        .sourceTexture(new ResourceLocation(MOD_ID, "block/honey_still"))
-                        .flowingTexture(new ResourceLocation(MOD_ID, "block/honey_flow"))
+                        // .sourceTexture(new ResourceLocation(MOD_ID, "block/honey_still"))
+                        .sourceTexture(new ResourceLocation("minecraft", "block/water_still"))
+                        // .flowingTexture(new ResourceLocation(MOD_ID, "block/honey_flow"))
+                        .flowingTexture(new ResourceLocation("minecraft", "block/water_flow"))
                         .blockSupplier(() -> BasicFluidHopper.HONEY_SOURCE_BLOCK)
                         .bucketItemSupplier(() -> BasicFluidHopper.HONEY_BUCKET);
 
