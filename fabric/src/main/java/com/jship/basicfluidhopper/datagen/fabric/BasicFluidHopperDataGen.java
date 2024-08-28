@@ -124,12 +124,6 @@ public class BasicFluidHopperDataGen implements DataGeneratorEntrypoint {
                 .requires(Items.BUCKET).requires(Items.HONEY_BOTTLE, 3)
                 .unlockedBy(getHasName(Items.HONEY_BOTTLE), has(Items.HONEY_BOTTLE))
                 .save(exporter, ResourceLocation.fromNamespaceAndPath(BasicFluidHopper.MOD_ID, "honey_bucket_from_bottles"));
-            Item water_bottle = Items.POTION.getDefaultInstance().getItem();
-            ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, Items.WATER_BUCKET)
-                .requires(Items.BUCKET).requires(water_bottle, 3)
-                .unlockedBy(getHasName(water_bottle), has(water_bottle))
-                .save(exporter, ResourceLocation.fromNamespaceAndPath(BasicFluidHopper.MOD_ID, "water_bucket_from_bottles"));
-            // Can't do water bucket -> 3 water bottles, because water bottles can't stack
         }
     }
 }
