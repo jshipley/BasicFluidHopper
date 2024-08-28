@@ -1,6 +1,5 @@
 package com.jship.basicfluidhopper.util.fabric;
 
-import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.util.FluidHopperUtil;
 
 import dev.architectury.fluid.FluidStack;

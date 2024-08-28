@@ -20,6 +20,7 @@ import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.Fluids;
 
@@ -107,7 +108,7 @@ public class BasicFluidHopperDataGen implements DataGeneratorEntrypoint {
             ShapelessRecipeBuilder.shapeless(RecipeCategory.REDSTONE, Items.HONEY_BLOCK)
                 .requires(BasicFluidHopper.C_HONEY_BUCKETS)
                 .unlockedBy("has_honey_bucket", has(BasicFluidHopper.C_HONEY_BUCKETS))
-                .save(exporter, new ResourceLocation(BasicFluidHopper.MOD_ID, "honey_block"));
+                .save(exporter, new ResourceLocation(BasicFluidHopper.MOD_ID, "honey_block_from_bucket"));
             ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, BasicFluidHopper.HONEY_BUCKET.get())
                 .requires(Items.HONEY_BLOCK).requires(Items.BUCKET)
                 .unlockedBy(getHasName(Items.HONEY_BLOCK), has(Items.HONEY_BLOCK))
@@ -123,7 +124,13 @@ public class BasicFluidHopperDataGen implements DataGeneratorEntrypoint {
             ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, BasicFluidHopper.HONEY_BUCKET.get())
                 .requires(Items.BUCKET).requires(Items.HONEY_BOTTLE, 3)
                 .unlockedBy(getHasName(Items.HONEY_BOTTLE), has(Items.HONEY_BOTTLE))
-                .save(exporter, new ResourceLocation(BasicFluidHopper.MOD_ID, "empty_bottles"));
+                .save(exporter, new ResourceLocation(BasicFluidHopper.MOD_ID, "honey_bucket_from_bottles"));
+            Item water_bottle = Items.POTION.getDefaultInstance().getItem();
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, Items.WATER_BUCKET)
+                .requires(Items.BUCKET).requires(water_bottle, 3)
+                .unlockedBy(getHasName(water_bottle), has(water_bottle))
+                .save(exporter, new ResourceLocation(BasicFluidHopper.MOD_ID, "water_bucket_from_bottles"));
+            // Can't do water bucket -> 3 water bottles, because water bottles can't stack
         }
     }
 }

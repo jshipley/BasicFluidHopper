@@ -103,6 +103,8 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
                     FluidVariant resource = fluidStorage.isResourceBlank() ? view.getResource() : fluidStorage.getResource();
                     long containerAmount = view.getAmount();
                     long maxExtract = Math.min(this.transferRate, view.getCapacity());
+                    long hopperSpace = fluidStorage.getCapacity() - fluidStorage.getAmount();
+                    maxExtract = Math.min(maxExtract, hopperSpace);
                     long extracted = view.extract(resource, maxExtract, nestedTx);
                     long inserted = fluidStorage.insert(resource, extracted, nestedTx);
                     if (extracted == inserted && extracted > 0 && (extracted == containerAmount || view.getCapacity() > FluidStack.bucketAmount())) {
@@ -159,6 +161,7 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
             long maxExtract = Math.min(this.transferRate, fluidStorage.getAmount());
             long inserted = itemStorage.insert(resource, maxExtract, tx);
             long extracted = fluidStorage.extract(resource, inserted, tx);
+            // may not be good enough if an item has multiple fluid storages with different sizes...
             long itemStorageCapacity = itemStorage.iterator().next().getCapacity();
             if (inserted == extracted && (inserted == itemStorageCapacity || itemStorageCapacity > FluidStack.bucketAmount())) {
                 filled = inserted;
