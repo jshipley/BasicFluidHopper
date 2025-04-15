@@ -81,13 +81,13 @@ public abstract class FluidHopperUtil {
                     && hopperFluid.get().getAmount() >= (long)(BasicFluidHopperConfig.FUEL_CONSUME_STEP * FluidStack.bucketAmount())) {
                 // Enough fuel to power a furnace for a bit longer was found in this hopper
                 return hopperEntity;
-            } else if (item.is(Items.GLASS_BOTTLE)
+            } else if (item != null && item.is(Items.GLASS_BOTTLE)
                     && hopperEntity.getFluidStorage().getAmount() >= FluidStack.bucketAmount() / 4
                     && (hopperFluid.get().getFluid().isSame(Fluids.WATER) || hopperFluid.get().getFluid().is(BasicFluidHopper.C_HONEY))) {
                 // Enough fluid that can go in a bottle was found in this hopper
                 // TODO support other mods that add additional bottled fluids
                 return hopperEntity;
-            } else if (item.getItem() instanceof BucketItem bucket && bucket.arch$getFluid() == Fluids.EMPTY
+            } else if (item != null && item.getItem() instanceof BucketItem bucket && bucket.arch$getFluid() == Fluids.EMPTY
                     && hopperFluid.get().getFluid().getBucket() != null
                     && hopperFluid.get().getAmount() >= FluidStack.bucketAmount()) {
                 // Enough fluid that can go in a bucket was found in this hopper
