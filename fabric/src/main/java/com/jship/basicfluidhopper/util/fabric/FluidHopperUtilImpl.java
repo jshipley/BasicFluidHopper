@@ -1,7 +1,6 @@
 package com.jship.basicfluidhopper.util.fabric;
 
 import com.jship.basicfluidhopper.util.FluidHopperUtil;
-
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.fabric.FluidStackHooksFabric;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
@@ -26,7 +25,6 @@ public class FluidHopperUtilImpl extends FluidHopperUtil {
     public static FluidStack getFluidFromItem(ItemStack filledContainer) {
         var storage = FluidStorage.ITEM.find(filledContainer, ContainerItemContext.withConstant(filledContainer));
         if (storage != null) {
-        
             for (var view : storage) {
                 var fluidStack = FluidStack.create(view.getResource().getFluid(), view.getAmount());
                 fluidStack.applyComponents(view.getResource().getComponents());
@@ -47,5 +45,4 @@ public class FluidHopperUtilImpl extends FluidHopperUtil {
         }
         return ItemStack.EMPTY;
     }
-    
 }

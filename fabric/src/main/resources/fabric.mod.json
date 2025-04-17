@@ -4,9 +4,7 @@
   "version": "${version}",
   "name": "Basic Fluid Hopper",
   "description": "A hopper that moves fluids instead of items.",
-  "authors": [
-    "jshipley"
-  ],
+  "authors": ["jshipley"],
   "contact": {
     "homepage": "https://fabricmc.net/",
     "sources": "https://github.com/FabricMC/fabric-example-mod"
@@ -15,25 +13,19 @@
   "icon": "assets/basic_fluid_hopper/icon.png",
   "environment": "*",
   "entrypoints": {
-    "main": [
-      "com.jship.basicfluidhopper.fabric.BasicFluidHopperFabric"
-    ],
+    "main": ["com.jship.basicfluidhopper.fabric.BasicFluidHopperFabric"],
     "client": [
       "com.jship.basicfluidhopper.client.fabric.BasicFluidHopperFabricClient"
     ],
-    "jade": [
-      "com.jship.basicfluidhopper.jade.fabric.JadePlugin"
-    ],
+    "jade": ["com.jship.basicfluidhopper.jade.fabric.JadePlugin"],
     "fabric-datagen": [
       "com.jship.basicfluidhopper.datagen.fabric.BasicFluidHopperDataGen"
     ]
   },
-  "mixins": [
-    "basic_fluid_hopper.mixins.json"
-  ],
+  "mixins": ["basic_fluid_hopper.mixins.json"],
   "depends": {
     "fabricloader": ">=0.16.0",
-    "minecraft": "1.21.*",
+    "minecraft": ">=1.21 <=1.21.1",
     "java": ">=21",
     "fabric-api": "*",
     "architectury": "*"

@@ -1,15 +1,13 @@
 package com.jship.basicfluidhopper.fluid;
 
-import java.util.Optional;
-
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.injectables.annotations.ExpectPlatform;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.VehicleEntity;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 
@@ -17,6 +15,7 @@ import net.minecraft.world.level.material.Fluid;
  * A common fluid storage class for fluid hoppers (and minecarts)
  */
 public abstract class HopperFluidStorage {
+
     /**
      * Create a new fluid storage for @blockEntity
      * @param maxAmount the maximum amount of fluid the storage can hold
@@ -47,14 +46,14 @@ public abstract class HopperFluidStorage {
      */
     public abstract long drainVehicle(Level level, VehicleEntity vehicle, boolean simulate);
 
-     /**
-      * Try to drain fluid from the fluid storage of an item
-      * @param player the player trying to drain the item
-      * @param hand the hand interacting with the hopper
-      * @param simulate the amount of fluid that was drained (or would be drained)
-      */
+    /**
+     * Try to drain fluid from the fluid storage of an item
+     * @param player the player trying to drain the item
+     * @param hand the hand interacting with the hopper
+     * @param simulate the amount of fluid that was drained (or would be drained)
+     */
     public abstract long drainItem(Player player, InteractionHand hand, boolean simulate);
-    
+
     /**
      * Try to fill the fluid storage of a block in the world
      * @param level the game world
@@ -75,11 +74,11 @@ public abstract class HopperFluidStorage {
     public abstract long fillVehicle(Level level, VehicleEntity vehicle, boolean simulate);
 
     /**
-      * Try to fill the fluid storage of an item
-      * @param player the player trying to drain the item
-      * @param hand the hand interacting with the hopper
-      * @param simulate the amount of fluid that was filled (or would be filled)
-      */
+     * Try to fill the fluid storage of an item
+     * @param player the player trying to drain the item
+     * @param hand the hand interacting with the hopper
+     * @param simulate the amount of fluid that was filled (or would be filled)
+     */
     public abstract long fillItem(Player player, InteractionHand hand, boolean simulate);
 
     /**
@@ -120,7 +119,7 @@ public abstract class HopperFluidStorage {
      * @return the current fluid amount in the fluid storage
      */
     public abstract long getAmount();
-    
+
     /**
      * Set the fluid amount in the fluid storage
      * @param amount

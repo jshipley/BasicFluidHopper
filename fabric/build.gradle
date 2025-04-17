@@ -46,10 +46,6 @@ processResources {
     }
 }
 
-// fabricApi {
-//     configureDataGeneration()
-// }
-
 loom {
     runs {
         datagen {

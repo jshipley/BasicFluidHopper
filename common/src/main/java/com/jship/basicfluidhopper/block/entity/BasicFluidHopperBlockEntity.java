@@ -5,8 +5,8 @@ import com.jship.basicfluidhopper.block.BasicFluidHopperBlock;
 import com.jship.basicfluidhopper.config.BasicFluidHopperConfig;
 import com.jship.basicfluidhopper.fluid.FluidHopper;
 import com.jship.basicfluidhopper.fluid.HopperFluidStorage;
-
 import dev.architectury.fluid.FluidStack;
+import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -15,15 +15,18 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.Optional;
-
 public class BasicFluidHopperBlockEntity extends BlockEntity implements FluidHopper {
+
     public final HopperFluidStorage fluidStorage;
     private int transferCooldown = -1;
 
     public BasicFluidHopperBlockEntity(BlockPos pos, BlockState state) {
         super(BasicFluidHopper.BASIC_FLUID_HOPPER_BLOCK_ENTITY.get(), pos, state);
-        fluidStorage = HopperFluidStorage.createFluidStorage(FluidStack.bucketAmount() * BasicFluidHopperConfig.BUCKET_CAPACITY, (long)(FluidStack.bucketAmount() * BasicFluidHopperConfig.MAX_TRANSFER), () -> this.markDirty());
+        fluidStorage = HopperFluidStorage.createFluidStorage(
+            FluidStack.bucketAmount() * BasicFluidHopperConfig.BUCKET_CAPACITY,
+            (long) (FluidStack.bucketAmount() * BasicFluidHopperConfig.MAX_TRANSFER),
+            () -> this.markDirty()
+        );
     }
 
     @Override
@@ -32,8 +35,7 @@ public class BasicFluidHopperBlockEntity extends BlockEntity implements FluidHop
         if (nbt.contains("fluid_stack")) {
             CompoundTag fluidStack = nbt.getCompound("fluid_stack");
             Optional<FluidStack> fluid = FluidStack.read(registryLookup, fluidStack);
-            if (fluid.isPresent())
-                fluidStorage.setFluidStack(fluid.get());
+            if (fluid.isPresent()) fluidStorage.setFluidStack(fluid.get());
         }
         this.transferCooldown = nbt.getInt("transfer_cooldown");
     }
@@ -80,12 +82,17 @@ public class BasicFluidHopperBlockEntity extends BlockEntity implements FluidHop
      * @param state the hopper's BlockState
      * @param blockEntity the hopper's BlockEntity
      */
-    public static void pushFluidTick(Level level, BlockPos pos, BlockState state, BasicFluidHopperBlockEntity blockEntity) {
+    public static void pushFluidTick(
+        Level level,
+        BlockPos pos,
+        BlockState state,
+        BasicFluidHopperBlockEntity blockEntity
+    ) {
         if (blockEntity.transferCooldown > 0) {
             --blockEntity.transferCooldown;
         }
         if (!blockEntity.needsCooldown()) {
-            FluidHopper.fillAndDrain(level, pos, state, (FluidHopper)blockEntity);
+            FluidHopper.fillAndDrain(level, pos, state, (FluidHopper) blockEntity);
         }
     }
 
@@ -110,6 +117,6 @@ public class BasicFluidHopperBlockEntity extends BlockEntity implements FluidHop
     public int getAnalogOutputSignal() {
         long amount = fluidStorage.getAmount();
         long limit = fluidStorage.getMaxAmount();
-        return (int) (15 * amount / limit);
+        return (int) ((15 * amount) / limit);
     }
 }

@@ -1,11 +1,9 @@
 package com.jship.basicfluidhopper.jade.fabric;
 
-import java.util.List;
-
 import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.fluid.fabric.HopperFluidStorageImpl;
 import com.jship.basicfluidhopper.vehicle.BasicFluidHopperMinecartEntity;
-
+import java.util.List;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import snownee.jade.api.Accessor;
@@ -16,10 +14,14 @@ import snownee.jade.api.view.IServerExtensionProvider;
 import snownee.jade.api.view.ViewGroup;
 import snownee.jade.util.JadeFabricUtils;
 
-public enum HopperMinecartFluidStorageProvider implements IServerExtensionProvider<CompoundTag>, IClientExtensionProvider<CompoundTag, FluidView> {
+public enum HopperMinecartFluidStorageProvider implements
+    IServerExtensionProvider<CompoundTag>, IClientExtensionProvider<CompoundTag, FluidView> {
     INSTANCE;
 
-    public static final ResourceLocation FLUID_STORAGE = ResourceLocation.fromNamespaceAndPath(BasicFluidHopper.MOD_ID, "fluid_storage");
+    public static final ResourceLocation FLUID_STORAGE = ResourceLocation.fromNamespaceAndPath(
+        BasicFluidHopper.MOD_ID,
+        "fluid_storage"
+    );
 
     @Override
     public ResourceLocation getUid() {
@@ -33,6 +35,8 @@ public enum HopperMinecartFluidStorageProvider implements IServerExtensionProvid
 
     @Override
     public List<ViewGroup<CompoundTag>> getGroups(Accessor<?> accessor) {
-        return JadeFabricUtils.fromFluidStorage(((HopperFluidStorageImpl)((BasicFluidHopperMinecartEntity)accessor.getTarget()).getFluidStorage()).getFluidStorage());
+        return JadeFabricUtils.fromFluidStorage(
+            ((HopperFluidStorageImpl) ((BasicFluidHopperMinecartEntity) accessor.getTarget()).getFluidStorage()).getFluidStorage()
+        );
     }
 }
