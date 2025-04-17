@@ -97,13 +97,13 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
         return drained;
     }
 
-    public long drainItem(Player player, InteractionHand hand, boolean simulate) {
+    public boolean drainItem(Player player, InteractionHand hand, boolean simulate) {
         long drained = 0;
         Storage<FluidVariant> itemStorage = FluidStorage.ITEM.find(
             player.getItemInHand(hand),
             ContainerItemContext.forPlayerInteraction(player, hand)
         );
-        if (isFull() || itemStorage == null) return drained;
+        if (isFull() || itemStorage == null) return false;
 
         try (var tx = Transaction.openOuter()) {
             for (var view : itemStorage.nonEmptyViews()) {
@@ -132,7 +132,7 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
                 }
             }
         }
-        return drained;
+        return drained > 0;
     }
 
     @Override
@@ -165,7 +165,7 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
         return filled;
     }
 
-    public long fillItem(Player player, InteractionHand hand, boolean simulate) {
+    public boolean fillItem(Player player, InteractionHand hand, boolean simulate) {
         long filled = 0;
         Storage<FluidVariant> itemStorage = FluidStorage.ITEM.find(
             player.getItemInHand(hand),
@@ -173,7 +173,7 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
                 ? ContainerItemContext.forCreativeInteraction(player, player.getItemInHand(hand))
                 : ContainerItemContext.forPlayerInteraction(player, hand)
         );
-        if (isEmpty() || itemStorage == null) return filled;
+        if (isEmpty() || itemStorage == null) return false;
 
         try (var tx = Transaction.openOuter()) {
             FluidVariant resource = fluidStorage.getResource();
@@ -190,7 +190,7 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
                 if (!simulate) tx.commit();
             }
         }
-        return filled;
+        return filled > 0;
     }
 
     public long add(FluidStack fluid, long amount, boolean simulate) {

@@ -80,17 +80,17 @@ public final class BasicFluidHopperNeoforge {
     //                         new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
     //     }
 
-    //     public BasicFluidHopperNeoforge(IEventBus modEventBus) {
-    //         BasicFluidHopper.init();
+        public BasicFluidHopperNeoforge(IEventBus modEventBus) {
+            BasicFluidHopper.init();
 
-    //         modEventBus.addListener(this::addCreative);
-    //     }
+            modEventBus.addListener(this::addCreative);
+        }
 
-    //     private void addCreative(BuildCreativeModeTabContentsEvent event) {
-    //         if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
-    //             event.accept(BasicFluidHopper.BASIC_FLUID_HOPPER_BLOCK.get());
-    //             event.accept(BasicFluidHopper.BASIC_FLUID_HOPPER_MINECART_ITEM.get());
-    //             event.accept(BasicFluidHopper.HONEY_BUCKET.get());
-    //         }
-    //     }
+        private void addCreative(BuildCreativeModeTabContentsEvent event) {
+            if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
+                event.accept(BasicFluidHopper.BASIC_FLUID_HOPPER_BLOCK.get());
+                event.accept(BasicFluidHopper.BASIC_FLUID_HOPPER_MINECART_ITEM.get());
+                event.accept(BasicFluidHopper.HONEY_BUCKET.get());
+            }
+        }
 }

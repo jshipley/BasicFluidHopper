@@ -88,8 +88,7 @@ public interface FluidHopper {
 
             // item is empty
             if (playerFluid.isEmpty()) {
-                long filled = fluidHopper.getFluidStorage().fillItem(player, hand, true);
-                if (filled > 0) {
+                if (fluidHopper.getFluidStorage().fillItem(player, hand, true)) {
                     fluidHopper.getFluidStorage().fillItem(player, hand, false);
                     return ItemInteractionResult.SUCCESS;
                 }
@@ -98,8 +97,7 @@ public interface FluidHopper {
                 !storageFluid.isPresent() ||
                 storageFluid.get().getAmount() < fluidHopper.getFluidStorage().getMaxAmount()
             ) {
-                long drained = fluidHopper.getFluidStorage().drainItem(player, hand, true);
-                if (drained > 0) {
+                if (fluidHopper.getFluidStorage().drainItem(player, hand, true)) {
                     fluidHopper.getFluidStorage().drainItem(player, hand, false);
                     return ItemInteractionResult.SUCCESS;
                 }
@@ -109,8 +107,7 @@ public interface FluidHopper {
                 storageFluid.isPresent() &&
                 storageFluid.get().getAmount() >= fluidHopper.getFluidStorage().getMaxAmount()
             ) {
-                long filled = fluidHopper.getFluidStorage().fillItem(player, hand, true);
-                if (filled > 0) {
+                if (fluidHopper.getFluidStorage().fillItem(player, hand, true)) {
                     fluidHopper.getFluidStorage().fillItem(player, hand, false);
                     return ItemInteractionResult.SUCCESS;
                 }

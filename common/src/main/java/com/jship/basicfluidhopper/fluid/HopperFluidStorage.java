@@ -52,7 +52,7 @@ public abstract class HopperFluidStorage {
      * @param hand the hand interacting with the hopper
      * @param simulate the amount of fluid that was drained (or would be drained)
      */
-    public abstract long drainItem(Player player, InteractionHand hand, boolean simulate);
+    public abstract boolean drainItem(Player player, InteractionHand hand, boolean simulate);
 
     /**
      * Try to fill the fluid storage of a block in the world
@@ -79,7 +79,7 @@ public abstract class HopperFluidStorage {
      * @param hand the hand interacting with the hopper
      * @param simulate the amount of fluid that was filled (or would be filled)
      */
-    public abstract long fillItem(Player player, InteractionHand hand, boolean simulate);
+    public abstract boolean fillItem(Player player, InteractionHand hand, boolean simulate);
 
     /**
      * Try to add fluid to the storage container
