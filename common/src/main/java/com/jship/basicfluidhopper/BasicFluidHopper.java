@@ -25,7 +25,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
@@ -155,7 +154,7 @@ public class BasicFluidHopper {
                     MobCategory.MISC
                 )
                     .sized(0.98F, 0.7F)
-                    .build(null)
+                    .build("basic_fluid_hopper_minecart")
         );
 
         ITEMS = MANAGER.get().get(Registries.ITEM);
@@ -163,15 +162,15 @@ public class BasicFluidHopper {
             ResourceLocation.fromNamespaceAndPath(BasicFluidHopper.MOD_ID, "basic_fluid_hopper"),
             () ->
                 new BlockItem(
-                    BasicFluidHopper.BASIC_FLUID_HOPPER_BLOCK.get(),
-                    new Item.Properties().arch$tab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
+                    BASIC_FLUID_HOPPER_BLOCK.get(),
+                    new Item.Properties()//.arch$tab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 )
         );
         BASIC_FLUID_HOPPER_MINECART_ITEM = ITEMS.register(
             ResourceLocation.fromNamespaceAndPath(BasicFluidHopper.MOD_ID, "basic_fluid_hopper_minecart"),
             () ->
                 new BasicFluidHopperMinecartItem(
-                    new Item.Properties().stacksTo(1).arch$tab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
+                    new Item.Properties().stacksTo(1)//.arch$tab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 )
         );
         HONEY_BUCKET = ITEMS.register(
@@ -179,7 +178,7 @@ public class BasicFluidHopper {
             () ->
                 new ArchitecturyBucketItem(
                     HONEY_FLUID,
-                    new Item.Properties().arch$tab(CreativeModeTabs.FUNCTIONAL_BLOCKS).craftRemainder(Items.BUCKET)
+                    new Item.Properties().craftRemainder(Items.BUCKET)//.arch$tab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
                 )
         );
     }
@@ -190,7 +189,7 @@ public class BasicFluidHopper {
 
         // Copy the water bucket dispenser behavior for honey buckets
         DispenseItemBehavior dispenserBehavior = DispenserBlock.DISPENSER_REGISTRY.get(Items.WATER_BUCKET);
-        DispenserBlock.registerBehavior(HONEY_BUCKET.get(), dispenserBehavior);
+        HONEY_BUCKET.listen((item) -> DispenserBlock.registerBehavior(item, dispenserBehavior));
 
         MidnightConfig.init(MOD_ID, BasicFluidHopperConfig.class);
     }

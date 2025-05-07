@@ -95,12 +95,12 @@ public abstract class AbstractFurnaceMixin {
         );
         if (
             fluidHopper != null &&
-            !fluidHopper.getFluidStorage().isEmpty() &&
-            fluidHopper.getFluidStorage().getFluid().is(BasicFluidHopper.C_FLUID_FUEL)
+            !fluidHopper.getFluidStorage().getFluidInTank(0).isEmpty() &&
+            fluidHopper.getFluidStorage().getFluidInTank(0).getFluid().is(BasicFluidHopper.C_FLUID_FUEL)
         ) {
             long fuel_consume_step = (long) (BasicFluidHopperConfig.FUEL_CONSUME_STEP * FluidStack.bucketAmount());
-            if (fluidHopper.getFluidStorage().remove(fuel_consume_step, true) == fuel_consume_step) {
-                fluidHopper.getFluidStorage().remove(fuel_consume_step, false);
+            if (fluidHopper.getFluidStorage().drain(fuel_consume_step, true).getAmount() == fuel_consume_step) {
+                fluidHopper.getFluidStorage().drain(fuel_consume_step, false);
                 // Set b4 to false here to bypass the logic that uses traditional fuel
                 b4.set(false);
             }

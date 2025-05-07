@@ -63,10 +63,10 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
     @Override
     public long drainVehicle(Level level, VehicleEntity vehicle, boolean simulate) {
         // given the lack of an fluid api for entities, only care about vehicles from this mod for now.
-        if (vehicle instanceof BasicFluidHopperMinecartEntity hopperEntity) return drainFluidStorage(
-            ((HopperFluidStorageImpl) hopperEntity.getFluidStorage()).fluidStorage,
-            simulate
-        );
+        // if (vehicle instanceof BasicFluidHopperMinecartEntity hopperEntity) return drainFluidStorage(
+        //     ((HopperFluidStorageImpl) hopperEntity.getFluidStorage()).fluidStorage,
+        //     simulate
+        // );
         return 0;
     }
 
@@ -146,10 +146,10 @@ public class HopperFluidStorageImpl extends HopperFluidStorage {
     @Override
     public long fillVehicle(Level level, VehicleEntity vehicle, boolean simulate) {
         // given the lack of an fluid api for entities, only care about vehicles from this mod for now.
-        if (vehicle instanceof BasicFluidHopperMinecartEntity hopperEntity) return fillFluidStorage(
-            ((HopperFluidStorageImpl) hopperEntity.getFluidStorage()).fluidStorage,
-            simulate
-        );
+        // if (vehicle instanceof BasicFluidHopperMinecartEntity hopperEntity) return fillFluidStorage(
+        //     ((HopperFluidStorageImpl) hopperEntity.getFluidStorage()).fluidStorage,
+        //     simulate
+        // );
         return 0;
     }
 

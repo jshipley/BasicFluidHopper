@@ -21,8 +21,8 @@ public class BasicFluidHopperBlockEntityRendererImpl implements BlockEntityRende
         int light,
         int overlay
     ) {
-        Optional<FluidStack> fluidStack = blockEntity.getFluidStorage().getFluidStack();
-        if (!fluidStack.isPresent() || fluidStack.get().isEmpty()) return;
+        FluidStack fluidStack = blockEntity.getFluidStorage().getFluidInTank(0);
+        if (!fluidStack.isEmpty()) return;
         // TODO render fluid in the hopper
     }
 }

@@ -2,10 +2,10 @@ package com.jship.basicfluidhopper.fluid;
 
 import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.config.BasicFluidHopperConfig;
-import com.jship.basicfluidhopper.util.FluidHopperUtil;
+import com.jship.spiritapi.api.fluid.SpiritFluidStorage;
+import com.jship.spiritapi.api.fluid.SpiritFluidUtil;
 import dev.architectury.fluid.FluidStack;
 import java.util.List;
-import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvent;
@@ -39,7 +39,7 @@ public interface FluidHopper {
     /**
      * @return a fluid storage for the fluid hopper
      */
-    public abstract HopperFluidStorage getFluidStorage();
+    public abstract SpiritFluidStorage getFluidStorage();
 
     public abstract void setTransferCooldown(int transferCooldown);
 
@@ -61,8 +61,8 @@ public interface FluidHopper {
         if (level.isClientSide) return false;
         if (!fluidHopper.needsCooldown() && fluidHopper.isEnabled()) {
             if (
-                (!fluidHopper.getFluidStorage().isEmpty() && FluidHopper.fill(level, pos, fluidHopper)) ||
-                (!fluidHopper.getFluidStorage().isFull() && FluidHopper.drain(level, pos, fluidHopper))
+                (!fluidHopper.getFluidStorage().getFluidInTank(0).isEmpty() && FluidHopper.fill(level, pos, fluidHopper)) ||
+                ((fluidHopper.getFluidStorage().getFluidInTank(0).getAmount() < fluidHopper.getFluidStorage().getTankCapacity(0)) && FluidHopper.drain(level, pos, fluidHopper))
             ) {
                 // fill or drain succeeded
                 fluidHopper.setTransferCooldown(BasicFluidHopperConfig.TRANSFER_COOLDOWN);
@@ -82,33 +82,31 @@ public interface FluidHopper {
         if (level.isClientSide) return ItemInteractionResult.SUCCESS;
 
         ItemStack item = player.getItemInHand(hand);
-        if (FluidHopperUtil.isFluidItem(item)) {
-            FluidStack playerFluid = FluidHopperUtil.getFluidFromItem(item);
-            Optional<FluidStack> storageFluid = fluidHopper.getFluidStorage().getFluidStack();
+        if (SpiritFluidUtil.isFluidItem(item)) {
+            FluidStack playerFluid = SpiritFluidUtil.getFluidFromItem(item);
+            FluidStack storageFluid = fluidHopper.getFluidStorage().getFluidInTank(0);
 
             // item is empty
             if (playerFluid.isEmpty()) {
-                if (fluidHopper.getFluidStorage().fillItem(player, hand, true)) {
-                    fluidHopper.getFluidStorage().fillItem(player, hand, false);
+                if (SpiritFluidUtil.fillItem(fluidHopper.getFluidStorage(), player, hand, true)) {
+                    SpiritFluidUtil.fillItem(fluidHopper.getFluidStorage(), player, hand, false);
                     return ItemInteractionResult.SUCCESS;
                 }
                 // hopper can hold more
             } else if (
-                !storageFluid.isPresent() ||
-                storageFluid.get().getAmount() < fluidHopper.getFluidStorage().getMaxAmount()
+                storageFluid.getAmount() < fluidHopper.getFluidStorage().getTankCapacity(0)
             ) {
-                if (fluidHopper.getFluidStorage().drainItem(player, hand, true)) {
-                    fluidHopper.getFluidStorage().drainItem(player, hand, false);
+                if (SpiritFluidUtil.drainItem(fluidHopper.getFluidStorage(), player, hand, true)) {
+                    SpiritFluidUtil.drainItem(fluidHopper.getFluidStorage(), player, hand, false);
                     return ItemInteractionResult.SUCCESS;
                 }
                 // hopper is full, try to drain it
                 // this will fail for buckets/bottles, but could still succeed for tanks
             } else if (
-                storageFluid.isPresent() &&
-                storageFluid.get().getAmount() >= fluidHopper.getFluidStorage().getMaxAmount()
+                storageFluid.getAmount() >= fluidHopper.getFluidStorage().getTankCapacity(0)
             ) {
-                if (fluidHopper.getFluidStorage().fillItem(player, hand, true)) {
-                    fluidHopper.getFluidStorage().fillItem(player, hand, false);
+                if (SpiritFluidUtil.fillItem(fluidHopper.getFluidStorage(), player, hand, true)) {
+                    SpiritFluidUtil.fillItem(fluidHopper.getFluidStorage(), player, hand, false);
                     return ItemInteractionResult.SUCCESS;
                 }
             }
@@ -128,11 +126,11 @@ public interface FluidHopper {
      * @return
      */
     public static boolean remove(FluidHopper fluidHopper, long amount) {
-        if (fluidHopper.getFluidStorage().isEmpty()) {
+        if (fluidHopper.getFluidStorage().getFluidInTank(0).isEmpty()) {
             return false;
         }
-        if (fluidHopper.getFluidStorage().remove(amount, true) == amount) {
-            fluidHopper.getFluidStorage().remove(amount, false);
+        if (fluidHopper.getFluidStorage().drain(amount, true).getAmount() == amount) {
+            fluidHopper.getFluidStorage().drain(amount, false);
             return true;
         }
         return false;
@@ -172,21 +170,19 @@ public interface FluidHopper {
      */
     private static boolean fill(Level level, BlockPos pos, FluidHopper fluidHopper) {
         // Try to fill a facing block
-        long filled = fluidHopper
-            .getFluidStorage()
-            .fillBlockPos(level, pos.relative(fluidHopper.getFacing()), fluidHopper.getFacing(), true);
+        long filled = SpiritFluidUtil.fillBlockPos(
+            fluidHopper.getFluidStorage(), level, pos.relative(fluidHopper.getFacing()), fluidHopper.getFacing(), true);
         if (filled > 0) {
-            fluidHopper
-                .getFluidStorage()
-                .fillBlockPos(level, pos.relative(fluidHopper.getFacing()), fluidHopper.getFacing(), false);
+            SpiritFluidUtil.fillBlockPos(
+                fluidHopper.getFluidStorage(), level, pos.relative(fluidHopper.getFacing()), fluidHopper.getFacing(), false);
             return true;
         }
 
         // Try to fill any vehicle in the facing block
         for (VehicleEntity vehicle : getVehicles(level, pos.relative(fluidHopper.getFacing()))) {
-            filled = fluidHopper.getFluidStorage().fillVehicle(level, vehicle, true);
+            filled = SpiritFluidUtil.fillVehicle(fluidHopper.getFluidStorage(), level, vehicle, true);
             if (filled > 0) {
-                fluidHopper.getFluidStorage().fillVehicle(level, vehicle, false);
+                SpiritFluidUtil.fillVehicle(fluidHopper.getFluidStorage(), level, vehicle, false);
                 return true;
             }
         }
@@ -202,9 +198,9 @@ public interface FluidHopper {
      */
     public static boolean drain(Level level, BlockPos pos, FluidHopper fluidHopper) {
         // Try to drain a fluid storage above
-        long drained = fluidHopper.getFluidStorage().drainBlockPos(level, pos.above(), true);
+        long drained = SpiritFluidUtil.drainBlockPos(fluidHopper.getFluidStorage(), level, pos.above(), true);
         if (drained > 0) {
-            fluidHopper.getFluidStorage().drainBlockPos(level, pos.above(), false);
+            SpiritFluidUtil.drainBlockPos(fluidHopper.getFluidStorage(), level, pos.above(), false);
             return true;
         }
 
@@ -215,9 +211,9 @@ public interface FluidHopper {
             if (honey_level > 0) {
                 long bottleAmount = FluidStack.bucketAmount() / 4;
                 FluidStack honey = FluidStack.create(BasicFluidHopper.HONEY_FLUID.get(), bottleAmount);
-                long added = fluidHopper.getFluidStorage().add(honey, bottleAmount, true);
+                long added = fluidHopper.getFluidStorage().fill(honey, true);
                 if (added == bottleAmount) {
-                    fluidHopper.getFluidStorage().add(honey, bottleAmount, false);
+                    fluidHopper.getFluidStorage().fill(honey, false);
                     level.setBlockAndUpdate(
                         pos.above(),
                         aboveState.setValue(BeehiveBlock.HONEY_LEVEL, honey_level - 1)
@@ -232,11 +228,11 @@ public interface FluidHopper {
             FluidState aboveFluidState = aboveState.getFluidState();
             if (aboveFluidState.isSource()) {
                 FluidStack fluid = FluidStack.create(aboveFluidState.getType(), FluidStack.bucketAmount());
-                long inserted = fluidHopper.getFluidStorage().add(fluid, FluidStack.bucketAmount(), true);
+                long inserted = fluidHopper.getFluidStorage().fill(fluid, true);
                 if (inserted == FluidStack.bucketAmount()) {
                     ItemStack bucket = bucketPickup.pickupBlock(null, level, pos.above(), aboveState);
                     if (!bucket.isEmpty()) {
-                        fluidHopper.getFluidStorage().add(fluid, FluidStack.bucketAmount(), false);
+                        fluidHopper.getFluidStorage().fill(fluid, false);
                         return true;
                     }
                 }
@@ -245,9 +241,9 @@ public interface FluidHopper {
 
         // Try to drain any vehicle in the above block
         for (VehicleEntity vehicle : FluidHopper.getVehicles(level, pos.above())) {
-            drained = fluidHopper.getFluidStorage().drainVehicle(level, vehicle, true);
+            drained = SpiritFluidUtil.drainVehicle(fluidHopper.getFluidStorage(), level, vehicle, true);
             if (drained > 0) {
-                fluidHopper.getFluidStorage().drainVehicle(level, vehicle, false);
+                SpiritFluidUtil.drainVehicle(fluidHopper.getFluidStorage(), level, vehicle, false);
                 return true;
             }
         }
@@ -261,16 +257,15 @@ public interface FluidHopper {
         BlockPos pos,
         Player player,
         InteractionHand hand,
-        HopperFluidStorage fluidStorage
+        SpiritFluidStorage fluidStorage
     ) {
-        if (fluidStorage.isEmpty()) return false;
-        Optional<FluidStack> fluid = fluidStorage.getFluidStack();
-        if (!fluid.isPresent()) return false;
+        FluidStack fluid = fluidStorage.getFluidInTank(0);
+        if (fluid.isEmpty()) return false;
 
-        long removed = fluidStorage.remove(FluidStack.bucketAmount(), true);
-        if (removed != FluidStack.bucketAmount()) return false;
+        FluidStack removed = fluidStorage.drain(FluidStack.bucketAmount(), true);
+        if (removed.getAmount() != FluidStack.bucketAmount()) return false;
 
-        Item bucket = fluid.get().getFluid().getBucket();
+        Item bucket = fluid.getFluid().getBucket();
         ItemStack emptyBucket = player.getItemInHand(hand);
         if (bucket != Items.AIR && emptyBucket.is(Items.BUCKET)) {
             ItemStack bucketStack = new ItemStack(bucket);
@@ -286,7 +281,7 @@ public interface FluidHopper {
             }
             level.playSound(null, pos, pickupSound, SoundSource.BLOCKS, 1.0F, 1.0F);
             level.gameEvent(null, GameEvent.FLUID_PICKUP, pos);
-            fluidStorage.remove(FluidStack.bucketAmount(), false);
+            fluidStorage.drain(FluidStack.bucketAmount(), false);
             return true;
         }
         return false;
@@ -298,14 +293,14 @@ public interface FluidHopper {
         BlockPos pos,
         Player player,
         InteractionHand hand,
-        HopperFluidStorage fluidStorage
+        SpiritFluidStorage fluidStorage
     ) {
         if (!(item.getItem() instanceof BucketItem bucketItem)) return false;
 
         FluidStack fluid = FluidStack.create(bucketItem.arch$getFluid(), FluidStack.bucketAmount());
         if (fluid.isEmpty()) return false;
 
-        long inserted = fluidStorage.add(fluid, FluidStack.bucketAmount(), true);
+        long inserted = fluidStorage.fill(fluid, true);
         if (inserted != FluidStack.bucketAmount()) return false;
 
         SoundEvent bucketEmpty;
@@ -322,7 +317,7 @@ public interface FluidHopper {
         ItemStack emptyBucket = new ItemStack(Items.BUCKET);
         emptyBucket.applyComponents(bucketItem.components());
         player.setItemInHand(hand, ItemUtils.createFilledResult(item, player, emptyBucket));
-        fluidStorage.add(fluid, FluidStack.bucketAmount(), false);
+        fluidStorage.fill(FluidStack.create(fluid, FluidStack.bucketAmount()), false);
 
         return true;
     }

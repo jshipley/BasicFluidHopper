@@ -1,0 +1,7 @@
+// 1.21.1	2025-05-06T21:18:00.011008	Basic Fluid Hopper/Model Definitions
+f3f9442ac4d876355f6370872dd5c8bf15f58ce5 assets\basic_fluid_hopper\models\item\basic_fluid_hopper.json
+cb0c19376b3e3be5eae0d2cd12f19487837ba72f assets\basic_fluid_hopper\blockstates\basic_fluid_hopper.json
+a79252e28503d9ae28cbc31c7695c6d62501c0e3 assets\basic_fluid_hopper\models\item\honey_bucket.json
+27aff61b1f84dea7bea27473d458b6cede5ac8ad assets\basic_fluid_hopper\models\block\honey.json
+cc40ebb05f1238575aa28abe09dac462d5d1dac0 assets\basic_fluid_hopper\models\item\basic_fluid_hopper_minecart.json
+877cf6c424ed26ef38d499cc721cdace79b645cd assets\basic_fluid_hopper\blockstates\honey.json

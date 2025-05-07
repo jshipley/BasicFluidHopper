@@ -24,26 +24,6 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class FluidHopperUtil {
 
-    @ExpectPlatform
-    public static boolean isFluidItem(ItemStack container) {
-        throw new AssertionError();
-    }
-
-    @ExpectPlatform
-    public static long getFluidItemCapacity(ItemStack container) {
-        throw new AssertionError();
-    }
-
-    @ExpectPlatform
-    public static FluidStack getFluidFromItem(ItemStack filledContainer) {
-        throw new AssertionError();
-    }
-
-    @ExpectPlatform
-    public static ItemStack getItemFromFluid(FluidStack fluid, ItemStack container) {
-        throw new AssertionError();
-    }
-
     @SuppressWarnings("deprecation")
     @Nullable
     public static BasicFluidHopperBlockEntity getHopperInsertingFluid(
@@ -69,20 +49,20 @@ public abstract class FluidHopperUtil {
                 !level.isClientSide() &&
                 level.getBlockEntity(pos.relative(direction)) instanceof BasicFluidHopperBlockEntity ent &&
                 ent.getFacing() == direction.getOpposite() &&
-                !ent.getFluidStorage().isEmpty()
+                !ent.getFluidStorage().getFluidInTank(0).isEmpty()
             ) {
                 hopperEntity = ent;
             } else {
                 continue;
             }
 
-            Optional<FluidStack> hopperFluid = hopperEntity.getFluidStorage().getFluidStack();
+            FluidStack hopperFluid = hopperEntity.getFluidStorage().getFluidInTank(0);
             if (
                 item == null &&
-                hopperFluid.isPresent() &&
+                !hopperFluid.isEmpty() &&
                 burnable &&
-                hopperFluid.get().getFluid().is(BasicFluidHopper.C_FLUID_FUEL) &&
-                hopperFluid.get().getAmount() >=
+                hopperFluid.getFluid().is(BasicFluidHopper.C_FLUID_FUEL) &&
+                hopperFluid.getAmount() >=
                 (long) (BasicFluidHopperConfig.FUEL_CONSUME_STEP * FluidStack.bucketAmount())
             ) {
                 // Enough fuel to power a furnace for a bit longer was found in this hopper
@@ -90,9 +70,9 @@ public abstract class FluidHopperUtil {
             } else if (
                 item != null &&
                 item.is(Items.GLASS_BOTTLE) &&
-                hopperEntity.getFluidStorage().getAmount() >= FluidStack.bucketAmount() / 4 &&
-                (hopperFluid.get().getFluid().isSame(Fluids.WATER) ||
-                    hopperFluid.get().getFluid().is(BasicFluidHopper.C_HONEY))
+                hopperFluid.getAmount() >= FluidStack.bucketAmount() / 4 &&
+                (hopperFluid.getFluid().isSame(Fluids.WATER) ||
+                    hopperFluid.getFluid().is(BasicFluidHopper.C_HONEY))
             ) {
                 // Enough fluid that can go in a bottle was found in this hopper
                 // TODO support other mods that add additional bottled fluids
@@ -101,8 +81,8 @@ public abstract class FluidHopperUtil {
                 item != null &&
                 item.getItem() instanceof BucketItem bucket &&
                 bucket.arch$getFluid() == Fluids.EMPTY &&
-                hopperFluid.get().getFluid().getBucket() != null &&
-                hopperFluid.get().getAmount() >= FluidStack.bucketAmount()
+                hopperFluid.getFluid().getBucket() != null &&
+                hopperFluid.getAmount() >= FluidStack.bucketAmount()
             ) {
                 // Enough fluid that can go in a bucket was found in this hopper
                 return hopperEntity;
@@ -130,16 +110,17 @@ public abstract class FluidHopperUtil {
             }
             long bottleAmount = FluidStack.bucketAmount() / 4;
             if (
-                fluidHopper.getFluidStorage().getFluid().isSame(Fluids.WATER) &&
-                fluidHopper.getFluidStorage().remove(bottleAmount, true) == bottleAmount
+                fluidHopper.getFluidStorage().getFluidInTank(0).getFluid().isSame(Fluids.WATER) &&
+                fluidHopper.getFluidStorage().drain(bottleAmount, true).getAmount() == bottleAmount
             ) {
-                fluidHopper.getFluidStorage().remove(bottleAmount, false);
+                fluidHopper.getFluidStorage().drain(bottleAmount, false);
                 return PotionContents.createItemStack(Items.POTION, Potions.WATER);
             } else if (
-                fluidHopper.getFluidStorage().getFluid().is(BasicFluidHopper.C_HONEY) &&
-                fluidHopper.getFluidStorage().remove(bottleAmount, true) == bottleAmount
+                // TODO use honey tag
+                fluidHopper.getFluidStorage().getFluidInTank(0).getFluid().is(BasicFluidHopper.C_HONEY) &&
+                fluidHopper.getFluidStorage().drain(bottleAmount, true).getAmount() == bottleAmount
             ) {
-                fluidHopper.getFluidStorage().remove(bottleAmount, false);
+                fluidHopper.getFluidStorage().drain(bottleAmount, false);
                 return new ItemStack(Items.HONEY_BOTTLE);
             }
         }
@@ -155,12 +136,12 @@ public abstract class FluidHopperUtil {
             if (fluidHopper == null) {
                 return new ItemStack(Items.AIR);
             }
-            Item bucketItem = fluidHopper.getFluidStorage().getFluid().getBucket();
+            Item bucketItem = fluidHopper.getFluidStorage().getFluidInTank(0).getFluid().getBucket();
             if (
                 bucketItem != Items.AIR &&
-                fluidHopper.getFluidStorage().remove(FluidStack.bucketAmount(), true) == FluidStack.bucketAmount()
+                fluidHopper.getFluidStorage().drain(FluidStack.bucketAmount(), true).getAmount() == FluidStack.bucketAmount()
             ) {
-                fluidHopper.getFluidStorage().remove(FluidStack.bucketAmount(), false);
+                fluidHopper.getFluidStorage().drain(FluidStack.bucketAmount(), false);
                 return new ItemStack(bucketItem);
             }
         }

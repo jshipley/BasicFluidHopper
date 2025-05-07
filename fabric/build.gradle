@@ -32,7 +32,9 @@ dependencies {
 
     modImplementation "dev.architectury:architectury-fabric:$rootProject.architectury_api_version"
     modImplementation "curse.maven:jade-324717:${fabric_jade_id}"
-    modImplementation(include("maven.modrinth:midnightlib:${midnightlib_version}-fabric"))
+    modImplementation(include("curse.maven:midnightlib-488090:${midnightlib_fabric_version_id}"))
+
+    include(modImplementation("com.jship.spiritapi:spiritapi-fabric:${spiritapi_version}"))
 
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionFabric')

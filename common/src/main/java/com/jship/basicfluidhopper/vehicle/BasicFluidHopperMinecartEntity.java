@@ -5,8 +5,8 @@ import java.util.Optional;
 import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.config.BasicFluidHopperConfig;
 import com.jship.basicfluidhopper.fluid.FluidHopper;
-import com.jship.basicfluidhopper.fluid.HopperFluidStorage;
 import com.jship.basicfluidhopper.util.FluidHopperUtil;
+import com.jship.spiritapi.api.fluid.SpiritFluidStorage;
 
 import dev.architectury.fluid.FluidStack;
 import net.minecraft.core.Direction;
@@ -29,18 +29,18 @@ import net.minecraft.world.level.Level;
 public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements FluidHopper {
 	private boolean enabled = true;
 	private int transferCooldown = -1;
-	public final HopperFluidStorage fluidStorage;
+	public final SpiritFluidStorage fluidStorage;
 
 	public BasicFluidHopperMinecartEntity(EntityType<?> entityType, Level level) {
 		super(entityType, level);
 		
-		this.fluidStorage = HopperFluidStorage.createFluidStorage(BasicFluidHopperConfig.BUCKET_CAPACITY * FluidStack.bucketAmount(),  (long)(FluidStack.bucketAmount() * BasicFluidHopperConfig.MAX_TRANSFER), () -> this.markDirty());
+		this.fluidStorage = SpiritFluidStorage.create(BasicFluidHopperConfig.BUCKET_CAPACITY * FluidStack.bucketAmount(),  (long)(FluidStack.bucketAmount() * BasicFluidHopperConfig.MAX_TRANSFER), () -> this.markDirty());
 	}
 
 	public BasicFluidHopperMinecartEntity(EntityType<?> type, Level level, double x, double y, double z) {
 		super(type, level, x, y, z);
 
-		this.fluidStorage = HopperFluidStorage.createFluidStorage(BasicFluidHopperConfig.BUCKET_CAPACITY * FluidStack.bucketAmount(),  (long)(FluidStack.bucketAmount() * BasicFluidHopperConfig.MAX_TRANSFER), () -> this.markDirty());
+		this.fluidStorage = SpiritFluidStorage.create(BasicFluidHopperConfig.BUCKET_CAPACITY * FluidStack.bucketAmount(),  (long)(FluidStack.bucketAmount() * BasicFluidHopperConfig.MAX_TRANSFER), () -> this.markDirty());
 	}
 
 	public static BasicFluidHopperMinecartEntity create(
@@ -55,7 +55,7 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 		return AbstractMinecart.Type.HOPPER;
 	}
 
-	public HopperFluidStorage getFluidStorage() {
+	public SpiritFluidStorage getFluidStorage() {
 		return this.fluidStorage;
 	}
 
@@ -129,30 +129,16 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 	protected void addAdditionalSaveData(CompoundTag nbt) {
 		super.addAdditionalSaveData(nbt);
 		nbt.putBoolean("enabled", this.enabled);
-		CompoundTag jadeData = new CompoundTag();
-		Optional<FluidStack> fluid = fluidStorage.getFluidStack();
-		if (fluid.isPresent()) {
-			nbt.put("fluid_stack", fluid.get().write(registryAccess(), new CompoundTag()));
-			jadeData.putLong("amount", fluid.get().getAmount());
-			jadeData.putString("type", fluid.get().getFluid().arch$registryName().getNamespace() + ":" + fluid.get().getFluid().arch$registryName().getPath());
-		} else {
-			jadeData.putLong("amount", 0L);
-			jadeData.putString("type", FluidStack.empty().getFluid().arch$registryName().getNamespace() + ":" + FluidStack.empty().getFluid().arch$registryName().getPath());
-		}
-		nbt.put("JadeFluidStorage", jadeData);
-		nbt.put("fluid_storage", jadeData);
+		CompoundTag fluidNbt = fluidStorage.serializeNbt(registryAccess());
+		nbt.merge(fluidNbt);
+		nbt.put("JadeFluidStorage", fluidNbt);
 	}
 
 	@Override
 	protected void readAdditionalSaveData(CompoundTag nbt) {
 		super.readAdditionalSaveData(nbt);
 		this.enabled = nbt.contains("enabled") ? nbt.getBoolean("enabled") : true;
-		if (nbt.contains("fluid_stack")) {
-			CompoundTag fluidStack = nbt.getCompound("fluid_stack");
-			Optional<FluidStack> fluid = FluidStack.read(registryAccess(), fluidStack);
-			if (fluid.isPresent())
-				fluidStorage.setFluidStack(fluid.get());
-		}
+		fluidStorage.deserializeNbt(registryAccess(), nbt);
 	}
 
 	@Override

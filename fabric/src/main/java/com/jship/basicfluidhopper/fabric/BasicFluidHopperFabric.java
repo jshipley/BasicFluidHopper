@@ -16,10 +16,10 @@ public class BasicFluidHopperFabric implements ModInitializer {
     public void onInitialize() {
         BasicFluidHopper.init();
 
-        FluidStorage.SIDED.registerForBlockEntity(
-            (tank, direction) -> ((HopperFluidStorageImpl) tank.fluidStorage).getFluidStorage(),
-            BasicFluidHopper.BASIC_FLUID_HOPPER_BLOCK_ENTITY.get()
-        );
+        // FluidStorage.SIDED.registerForBlockEntity(
+        //     (tank, direction) -> ((SpiritFluidStorageImpl) tank.fluidStorage).getFluidStorage(),
+        //     BasicFluidHopper.BASIC_FLUID_HOPPER_BLOCK_ENTITY.get()
+        // );
         FluidStorage.combinedItemApiProvider(Items.HONEY_BOTTLE).register(HoneyBottleStorage::find);
         FluidStorage.combinedItemApiProvider(Items.GLASS_BOTTLE).register(context -> {
             return new EmptyItemFluidStorage(
