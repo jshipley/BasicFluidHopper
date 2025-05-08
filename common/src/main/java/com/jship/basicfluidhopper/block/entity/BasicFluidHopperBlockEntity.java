@@ -10,6 +10,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -24,7 +27,11 @@ public class BasicFluidHopperBlockEntity extends BlockEntity implements FluidHop
         fluidStorage = SpiritFluidStorage.create(
             FluidStack.bucketAmount() * BasicFluidHopperConfig.BUCKET_CAPACITY,
             (long) (FluidStack.bucketAmount() * BasicFluidHopperConfig.MAX_TRANSFER),
-            () -> this.markDirty()
+            () -> {
+                if (!level.isClientSide())
+                    level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+                this.markDirty();
+            }
         );
     }
 
@@ -43,9 +50,14 @@ public class BasicFluidHopperBlockEntity extends BlockEntity implements FluidHop
     }
 
     @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registryLookup) {
         CompoundTag nbt = super.getUpdateTag(registryLookup);
-        nbt.merge(fluidStorage.serializeNbt(registryLookup));
+        saveAdditional(nbt, registryLookup);
         return nbt;
     }
 
@@ -98,6 +110,7 @@ public class BasicFluidHopperBlockEntity extends BlockEntity implements FluidHop
     @Override
     public void markDirty() {
         this.setChanged();
+        // if (!level.isClientSide()) level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
     }
 
     /**

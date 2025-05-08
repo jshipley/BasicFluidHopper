@@ -10,6 +10,7 @@ import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import dev.architectury.fluid.FluidStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -29,75 +30,50 @@ public abstract class AbstractFurnaceMixin {
         BlockPos pos = blockEntity.getBlockPos();
 
         BasicFluidHopperBlockEntity fluidHopper = FluidHopperUtil.getHopperInsertingFluid(
-            blockEntity.getLevel(),
-            pos,
-            blockEntity.getBlockState(),
-            blockEntity,
-            true,
-            null
-        );
+                blockEntity.getLevel(),
+                pos,
+                blockEntity.getBlockState(),
+                blockEntity,
+                true,
+                null);
 
         if (fluidHopper != null) {
-            cir.setReturnValue((int) (BasicFluidHopperConfig.FUEL_CONSUME_STEP * FluidStack.bucketAmount()));
+            cir.setReturnValue((int) (BasicFluidHopperConfig.FUEL_CONSUME_STEP * AbstractFurnaceBlockEntity.getFuel().getOrDefault(Items.LAVA_BUCKET, 20000)));
         }
     }
 
-    // Should change
-    // blockEntity.isLit() || hasFuel && hasInput
-    // to
-    // blockEntity.isLit() || hasFluidFuel || hasFuel && hasInput
-    @ModifyExpressionValue(
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;isLit()Z",
-            ordinal = 2
-        ),
-        method = "serverTick(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;)V"
-    )
-    private static boolean hasFluidFuel(
-        boolean isLit,
-        @Local Level level,
-        @Local BlockPos blockPos,
-        @Local BlockState state,
-        @Local AbstractFurnaceBlockEntity blockEntity
-    ) {
-        return (
-            isLit || FluidHopperUtil.getHopperInsertingFluid(level, blockPos, state, blockEntity, true, null) != null
-        );
+    // Return true if hopper is inserting fuel or original return value was true
+    @ModifyExpressionValue(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;isLit()Z", ordinal = 2), method = "serverTick(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;)V")
+    private static boolean hasFuel(
+            boolean isLit,
+            @Local Level level,
+            @Local BlockPos blockPos,
+            @Local BlockState state,
+            @Local AbstractFurnaceBlockEntity blockEntity) {
+        return (isLit
+                || FluidHopperUtil.getHopperInsertingFluid(level, blockPos, state, blockEntity, true, null) != null);
     }
 
     // If fluid fuel can be used then use it and set b4 (hasFuel) to false so that
     // the furnace doesn't try to use anything in the fuel slot
-    @Inject(
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;isLit()Z",
-            ordinal = 4,
-            shift = At.Shift.AFTER
-        ),
-        method = "serverTick(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;)V"
-    )
+    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;isLit()Z", ordinal = 4, shift = At.Shift.AFTER), method = "serverTick(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;)V")
     private static void consumeFuel(
-        Level level,
-        BlockPos pos,
-        BlockState blockState,
-        AbstractFurnaceBlockEntity blockEntity,
-        CallbackInfo cbi,
-        @Local(ordinal = 3) LocalBooleanRef b4
-    ) {
+            Level level,
+            BlockPos pos,
+            BlockState blockState,
+            AbstractFurnaceBlockEntity blockEntity,
+            CallbackInfo cbi,
+            @Local(ordinal = 3) LocalBooleanRef b4) {
         BasicFluidHopperBlockEntity fluidHopper = FluidHopperUtil.getHopperInsertingFluid(
-            level,
-            pos,
-            blockState,
-            blockEntity,
-            true,
-            null
-        );
-        if (
-            fluidHopper != null &&
-            !fluidHopper.getFluidStorage().getFluidInTank(0).isEmpty() &&
-            fluidHopper.getFluidStorage().getFluidInTank(0).getFluid().is(BasicFluidHopper.C_FLUID_FUEL)
-        ) {
+                level,
+                pos,
+                blockState,
+                blockEntity,
+                true,
+                null);
+        if (fluidHopper != null &&
+                !fluidHopper.getFluidStorage().getFluidInTank(0).isEmpty() &&
+                fluidHopper.getFluidStorage().getFluidInTank(0).getFluid().is(BasicFluidHopper.C_FLUID_FUEL)) {
             long fuel_consume_step = (long) (BasicFluidHopperConfig.FUEL_CONSUME_STEP * FluidStack.bucketAmount());
             if (fluidHopper.getFluidStorage().drain(fuel_consume_step, true).getAmount() == fuel_consume_step) {
                 fluidHopper.getFluidStorage().drain(fuel_consume_step, false);

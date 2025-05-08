@@ -1,16 +1,18 @@
 package com.jship.basicfluidhopper.vehicle;
 
-import java.util.Optional;
-
 import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.config.BasicFluidHopperConfig;
 import com.jship.basicfluidhopper.fluid.FluidHopper;
-import com.jship.basicfluidhopper.util.FluidHopperUtil;
 import com.jship.spiritapi.api.fluid.SpiritFluidStorage;
 
 import dev.architectury.fluid.FluidStack;
+import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -18,29 +20,32 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
-import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements FluidHopper {
 	private boolean enabled = true;
 	private int transferCooldown = -1;
 	public final SpiritFluidStorage fluidStorage;
 
+	public static final EntityDataAccessor<CompoundTag> DATA_ID_FLUID = SynchedEntityData.defineId(BasicFluidHopperMinecartEntity.class, EntityDataSerializers.COMPOUND_TAG);
+
 	public BasicFluidHopperMinecartEntity(EntityType<?> entityType, Level level) {
 		super(entityType, level);
-		
-		this.fluidStorage = SpiritFluidStorage.create(BasicFluidHopperConfig.BUCKET_CAPACITY * FluidStack.bucketAmount(),  (long)(FluidStack.bucketAmount() * BasicFluidHopperConfig.MAX_TRANSFER), () -> this.markDirty());
+
+		this.fluidStorage = SpiritFluidStorage.create(
+				BasicFluidHopperConfig.BUCKET_CAPACITY * FluidStack.bucketAmount(),
+				(long) (FluidStack.bucketAmount() * BasicFluidHopperConfig.MAX_TRANSFER), () -> this.markDirty());
 	}
 
 	public BasicFluidHopperMinecartEntity(EntityType<?> type, Level level, double x, double y, double z) {
 		super(type, level, x, y, z);
 
-		this.fluidStorage = SpiritFluidStorage.create(BasicFluidHopperConfig.BUCKET_CAPACITY * FluidStack.bucketAmount(),  (long)(FluidStack.bucketAmount() * BasicFluidHopperConfig.MAX_TRANSFER), () -> this.markDirty());
+		this.fluidStorage = SpiritFluidStorage.create(
+				BasicFluidHopperConfig.BUCKET_CAPACITY * FluidStack.bucketAmount(),
+				(long) (FluidStack.bucketAmount() * BasicFluidHopperConfig.MAX_TRANSFER), () -> this.markDirty());
 	}
 
 	public static BasicFluidHopperMinecartEntity create(
@@ -99,14 +104,24 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 		return FluidHopper.drain(this.level(), this.getOnPos(), this);
 	}
 
-	@SuppressWarnings("resource")
 	@Override
 	public InteractionResult interact(Player player, InteractionHand hand) {
-		return FluidHopper.useFluidItem(this.level(), player, hand, (FluidHopper)this).result();
+		return FluidHopper.useFluidItem(this.level(), player, hand, (FluidHopper) this).result();
+	}
+
+	public FluidStack getFluidStack() {
+		CompoundTag fluidTag = this.getEntityData().get(BasicFluidHopperMinecartEntity.DATA_ID_FLUID);
+        if (fluidTag.isEmpty()) 
+            return FluidStack.empty();
+        return FluidStackHooks.read(this.registryAccess(), fluidTag).orElse(FluidStack.empty());
 	}
 
 	@Override
 	public void markDirty() {
+		CompoundTag nbt = new CompoundTag();
+		if (!fluidStorage.getFluidInTank(0).isEmpty())
+			nbt.merge((CompoundTag)(FluidStackHooks.write(registryAccess(), fluidStorage.getFluidInTank(0), nbt)));
+		this.entityData.set(DATA_ID_FLUID, nbt);
 	}
 
 	@Override
@@ -115,10 +130,11 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 	}
 
 	@Override
-	// Overriding destroy because for some reason getDropItem wasn't being recognized
+	// Overriding destroy because for some reason getDropItem wasn't being
+	// recognized
 	protected void destroy(DamageSource source) {
-        this.destroy(this.getDropItem());
-    }
+		this.destroy(this.getDropItem());
+	}
 
 	@Override
 	public ItemStack getPickResult() {
@@ -139,6 +155,13 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 		super.readAdditionalSaveData(nbt);
 		this.enabled = nbt.contains("enabled") ? nbt.getBoolean("enabled") : true;
 		fluidStorage.deserializeNbt(registryAccess(), nbt);
+		this.entityData.set(DATA_ID_FLUID, nbt.getCompound("Fluid"));
+	}
+
+	@Override
+	public void defineSynchedData(SynchedEntityData.Builder builder) {
+		super.defineSynchedData(builder);
+		builder.define(DATA_ID_FLUID, new CompoundTag());
 	}
 
 	@Override
@@ -153,7 +176,8 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 
 	@Override
 	public Direction getFacing() {
-		// Only relevant if the fill methods are called, but they shouldn't be for a hopper minecart.
+		// Only relevant if the fill methods are called, but they shouldn't be for a
+		// hopper minecart.
 		return Direction.DOWN;
 	}
 }

@@ -25,8 +25,8 @@ public abstract class DispenseBucketMixin extends DefaultDispenseItemBehavior {
         ItemStack filledItem = FluidHopperUtil.fillDispenserItemFromHopper(itemStack, blockSource);
         if (!filledItem.is(Items.AIR)) {
             blockSource.level().gameEvent(null, GameEvent.FLUID_PICKUP, blockSource.pos());
-            // itemStack.shrink(1);
-            //dispenseItemBehavior.dispense(blockSource, filledItem);
+            itemStack.shrink(1);
+            dispenseItemBehavior.dispense(blockSource, filledItem);
             DispenserBlock.DISPENSER_REGISTRY.get(filledItem.getItem()).dispense(blockSource, filledItem);
             cir.setReturnValue(itemStack);
         }
