@@ -25,8 +25,8 @@ public class BasicFluidHopperBlockEntity extends BlockEntity implements FluidHop
     public BasicFluidHopperBlockEntity(BlockPos pos, BlockState state) {
         super(BasicFluidHopper.BASIC_FLUID_HOPPER_BLOCK_ENTITY.get(), pos, state);
         fluidStorage = SpiritFluidStorage.create(
-            FluidStack.bucketAmount() * BasicFluidHopperConfig.BUCKET_CAPACITY,
-            (long) (FluidStack.bucketAmount() * BasicFluidHopperConfig.MAX_TRANSFER),
+            FluidStack.bucketAmount() * BasicFluidHopperConfig.hopperCapacity(),
+            (long) (FluidStack.bucketAmount() * BasicFluidHopperConfig.transferRate()),
             () -> {
                 if (!level.isClientSide())
                     level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);

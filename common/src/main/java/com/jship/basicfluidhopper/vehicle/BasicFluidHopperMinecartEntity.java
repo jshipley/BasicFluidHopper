@@ -4,6 +4,7 @@ import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.config.BasicFluidHopperConfig;
 import com.jship.basicfluidhopper.fluid.FluidHopper;
 import com.jship.spiritapi.api.fluid.SpiritFluidStorage;
+import com.jship.spiritapi.api.fluid.SpiritFluidStorageProvider;
 
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
@@ -25,7 +26,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements FluidHopper {
+public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements FluidHopper, SpiritFluidStorageProvider {
 	private boolean enabled = true;
 	private int transferCooldown = -1;
 	public final SpiritFluidStorage fluidStorage;
@@ -36,16 +37,16 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 		super(entityType, level);
 
 		this.fluidStorage = SpiritFluidStorage.create(
-				BasicFluidHopperConfig.BUCKET_CAPACITY * FluidStack.bucketAmount(),
-				(long) (FluidStack.bucketAmount() * BasicFluidHopperConfig.MAX_TRANSFER), () -> this.markDirty());
+				BasicFluidHopperConfig.hopperCapacity() * FluidStack.bucketAmount(),
+				(long) (FluidStack.bucketAmount() * BasicFluidHopperConfig.transferRate()), () -> this.markDirty());
 	}
 
 	public BasicFluidHopperMinecartEntity(EntityType<?> type, Level level, double x, double y, double z) {
 		super(type, level, x, y, z);
 
 		this.fluidStorage = SpiritFluidStorage.create(
-				BasicFluidHopperConfig.BUCKET_CAPACITY * FluidStack.bucketAmount(),
-				(long) (FluidStack.bucketAmount() * BasicFluidHopperConfig.MAX_TRANSFER), () -> this.markDirty());
+				BasicFluidHopperConfig.hopperCapacity() * FluidStack.bucketAmount(),
+				(long) (FluidStack.bucketAmount() * BasicFluidHopperConfig.transferRate()), () -> this.markDirty());
 	}
 
 	public static BasicFluidHopperMinecartEntity create(
@@ -60,8 +61,8 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 		return AbstractMinecart.Type.HOPPER;
 	}
 
-	public SpiritFluidStorage getFluidStorage() {
-		return this.fluidStorage;
+	public SpiritFluidStorage getFluidStorage(Direction face) {
+		return face == Direction.DOWN ? this.fluidStorage : null;
 	}
 
 	@Override
@@ -101,7 +102,7 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 	}
 
 	public boolean canOperate() {
-		return FluidHopper.drain(this.level(), this.getOnPos(), this);
+		return FluidHopper.drain(this.level(), this.getOnPos(), Direction.UP, this);
 	}
 
 	@Override
@@ -179,5 +180,10 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 		// Only relevant if the fill methods are called, but they shouldn't be for a
 		// hopper minecart.
 		return Direction.DOWN;
+	}
+
+	@Override
+	public SpiritFluidStorage getFluidStorage() {
+		return this.fluidStorage;
 	}
 }

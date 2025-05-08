@@ -1,18 +1,78 @@
 package com.jship.basicfluidhopper.config;
 
-import eu.midnightdust.lib.config.MidnightConfig;
+import dev.isxander.yacl3.api.ConfigCategory;
+import dev.isxander.yacl3.api.Option;
+import dev.isxander.yacl3.api.OptionDescription;
+import dev.isxander.yacl3.api.YetAnotherConfigLib;
+import dev.isxander.yacl3.api.controller.FloatFieldControllerBuilder;
+import dev.isxander.yacl3.api.controller.IntegerFieldControllerBuilder;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
-public class BasicFluidHopperConfig extends MidnightConfig {
+public class BasicFluidHopperConfig {
+    public static final BasicFluidHopperConfig INSTANCE = new BasicFluidHopperConfig();
 
-    @Entry(min = 0, max = 100)
-    public static final int TRANSFER_COOLDOWN = 8;
+    private int transferCooldown = 8;
+    private int hopperCapacity = 1;
+    private float transferRate = 1.0f;
+    private float fuelConsumeStep = 0.1f;
 
-    @Entry(min = 1, max = 1000)
-    public static final int BUCKET_CAPACITY = 1;
+    public static int transferCooldown() {
+        return INSTANCE.transferCooldown;
+    }
 
-    @Entry(min = 0.25F, max = 1000F, precision = 4)
-    public static final float MAX_TRANSFER = 1.0F;
+    public static int hopperCapacity() {
+        return INSTANCE.hopperCapacity;
+    }
 
-    @Entry(min = 0.1F)
-    public static final float FUEL_CONSUME_STEP = 0.2F;
+    public static float transferRate() {
+        return INSTANCE.transferRate;
+    }
+
+    public static float fuelConsumeStep() {
+        return INSTANCE.fuelConsumeStep;
+    }
+
+    public static Screen createConfig(Screen parentScreen) {
+        return YetAnotherConfigLib.createBuilder()
+            .title(Component.literal("Basic Fluid Hopper"))
+            
+            .category(ConfigCategory.createBuilder()
+                .name(Component.literal("Basic Fluid Hopper"))
+                .option(Option.<Integer>createBuilder()
+                    .name(Component.translatable("config.basic_fluid_hopper.transfer_cooldown"))
+                    .description(OptionDescription.of(Component.translatable("config.basic_fluid_hopper.transfer_cooldown.desc")))
+                    .binding(8, () -> INSTANCE.transferCooldown, newVal -> INSTANCE.transferCooldown = newVal)
+                    .controller(opt -> IntegerFieldControllerBuilder.create(opt)
+                        .range(0, 100)
+                        .valueFormatter(val -> Component.translatable("config.basic_fluid_hopper.transfer_cooldown.format", val)))
+                    .build())
+                .option(Option.<Integer>createBuilder()
+                    .name(Component.translatable("config.basic_fluid_hopper.hopper_capacity"))
+                    .description(OptionDescription.of(Component.translatable("config.basic_fluid_hopper.hopper_capacity.desc")))
+                    .binding(1, () -> INSTANCE.hopperCapacity, newVal -> INSTANCE.hopperCapacity = newVal)
+                    .controller(opt -> IntegerFieldControllerBuilder.create(opt)
+                        .range(0, 1000)
+                        .valueFormatter(val -> Component.translatable("config.basic_fluid_hopper.hopper_capacity.format", val)))
+                    .build())
+                .option(Option.<Float>createBuilder()
+                    .name(Component.translatable("config.basic_fluid_hopper.transfer_rate"))
+                    .description(OptionDescription.of(Component.translatable("config.basic_fluid_hopper.transfer_rate.desc")))
+                    .binding(0.25f, () -> INSTANCE.transferRate, newVal -> INSTANCE.transferRate = newVal)
+                    .controller(opt -> FloatFieldControllerBuilder.create(opt)
+                        .range(0.25f, 1000.0f)
+                        .valueFormatter(val -> Component.translatable("config.basic_fluid_hopper.transfer_rate.format", val)))
+                    .build())
+                .option(Option.<Float>createBuilder()
+                    .name(Component.translatable("config.basic_fluid_hopper.fuel_consume_step"))
+                    .description(OptionDescription.of(Component.translatable("config.basic_fluid_hopper.fuel_consume_step.desc")))
+                    .binding(0.1f, () -> INSTANCE.fuelConsumeStep, newVal -> INSTANCE.fuelConsumeStep = newVal)
+                    .controller(opt -> FloatFieldControllerBuilder.create(opt)
+                        .range(0.01f, 1.0f)
+                        .valueFormatter(val -> Component.translatable("config.basic_fluid_hopper.fuel_consume_step.format", val)))
+                    .build())
+                .build()
+            ).build()
+            .generateScreen(parentScreen);
+    }
 }

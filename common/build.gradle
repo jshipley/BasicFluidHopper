@@ -8,11 +8,11 @@ dependencies {
     // Do NOT use other classes from Fabric Loader.
     modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
 
-    modCompileOnly "curse.maven:midnightlib-488090:${midnightlib_fabric_version_id}"
-
     modImplementation "dev.architectury:architectury:$rootProject.architectury_api_version"
 
-    modImplementation("com.jship.spiritapi:spiritapi-common:$spiritapi_version")
+    modImplementation("maven.modrinth:spiritapi-fabric:$spiritapi_fabric_version_id")
+
+    modImplementation("dev.isxander:yet-another-config-lib:${yacl_version}-fabric")
 }
 
 loom {

@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalFluidTags;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -57,8 +58,7 @@ public class BasicFluidHopperDataGen implements DataGeneratorEntrypoint {
 
         @Override
         protected void addTags(HolderLookup.Provider provider) {
-            getOrCreateTagBuilder(FluidTags.WATER).add(BasicFluidHopper.HONEY_FLUID.get());
-            getOrCreateTagBuilder(BasicFluidHopper.C_HONEY)
+            getOrCreateTagBuilder(ConventionalFluidTags.HONEY)
                     .add(BasicFluidHopper.HONEY_FLUID.get())
                     .add(BasicFluidHopper.HONEY_FLUID_FLOWING.get());
             getOrCreateTagBuilder(BasicFluidHopper.C_VISUAL_HONEY)

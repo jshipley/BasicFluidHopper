@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.block.entity.BasicFluidHopperBlockEntity;
 import com.jship.basicfluidhopper.block.renderer.BasicFluidHopperBlockEntityRenderer;
+import com.jship.basicfluidhopper.config.BasicFluidHopperConfig;
 import com.jship.basicfluidhopper.fluid.neoforge.BottleFluidHandler;
 import com.jship.basicfluidhopper.vehicle.BasicFluidHopperMinecartEntity;
 import com.jship.basicfluidhopper.vehicle.BasicFluidHopperMinecartEntityRenderer;
@@ -15,13 +16,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
-import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 
 @Mod(BasicFluidHopper.MOD_ID)
@@ -30,7 +32,9 @@ public final class BasicFluidHopperNeoforge {
     public BasicFluidHopperNeoforge(IEventBus modEventBus) {
         BasicFluidHopper.init();
 
-        NeoForgeMod.enableMilkFluid();
+        ModLoadingContext.get().registerExtensionPoint(
+            IConfigScreenFactory.class,
+            () -> (client, parent) -> BasicFluidHopperConfig.createConfig(parent));
 
         modEventBus.addListener(this::addCreative);
         modEventBus.addListener(this::registerCapabilities);

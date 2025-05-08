@@ -63,7 +63,7 @@ public abstract class FluidHopperUtil {
                 burnable &&
                 hopperFluid.getFluid().is(BasicFluidHopper.C_FLUID_FUEL) &&
                 hopperFluid.getAmount() >=
-                (long) (BasicFluidHopperConfig.FUEL_CONSUME_STEP * FluidStack.bucketAmount())
+                (long) (BasicFluidHopperConfig.fuelConsumeStep() * FluidStack.bucketAmount())
             ) {
                 // Enough fuel to power a furnace for a bit longer was found in this hopper
                 return hopperEntity;

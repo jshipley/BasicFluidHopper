@@ -38,7 +38,7 @@ public abstract class AbstractFurnaceMixin {
                 null);
 
         if (fluidHopper != null) {
-            cir.setReturnValue((int) (BasicFluidHopperConfig.FUEL_CONSUME_STEP * AbstractFurnaceBlockEntity.getFuel().getOrDefault(Items.LAVA_BUCKET, 20000)));
+            cir.setReturnValue((int) (BasicFluidHopperConfig.fuelConsumeStep() * AbstractFurnaceBlockEntity.getFuel().getOrDefault(Items.LAVA_BUCKET, 20000)));
         }
     }
 
@@ -74,7 +74,7 @@ public abstract class AbstractFurnaceMixin {
         if (fluidHopper != null &&
                 !fluidHopper.getFluidStorage().getFluidInTank(0).isEmpty() &&
                 fluidHopper.getFluidStorage().getFluidInTank(0).getFluid().is(BasicFluidHopper.C_FLUID_FUEL)) {
-            long fuel_consume_step = (long) (BasicFluidHopperConfig.FUEL_CONSUME_STEP * FluidStack.bucketAmount());
+            long fuel_consume_step = (long) (BasicFluidHopperConfig.fuelConsumeStep() * FluidStack.bucketAmount());
             if (fluidHopper.getFluidStorage().drain(fuel_consume_step, true).getAmount() == fuel_consume_step) {
                 fluidHopper.getFluidStorage().drain(fuel_consume_step, false);
                 // Set b4 to false here to bypass the logic that uses traditional fuel

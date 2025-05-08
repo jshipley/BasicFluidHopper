@@ -1,9 +1,9 @@
 package com.jship.basicfluidhopper.jade.fabric;
 
 import com.jship.basicfluidhopper.BasicFluidHopper;
-import com.jship.basicfluidhopper.fluid.fabric.HopperFluidStorageImpl;
 import com.jship.basicfluidhopper.vehicle.BasicFluidHopperMinecartEntity;
 import com.jship.spiritapi.api.fluid.SpiritFluidStorage;
+import com.jship.spiritapi.api.fluid.fabric.SpiritFluidStorageImpl;
 
 import java.util.List;
 import net.minecraft.nbt.CompoundTag;
@@ -37,9 +37,8 @@ public enum HopperMinecartFluidStorageProvider implements
 
     @Override
     public List<ViewGroup<CompoundTag>> getGroups(Accessor<?> accessor) {
-        // return JadeFabricUtils.fromFluidStorage(
-        //     ((SpiritFluidStorageImpl) ((BasicFluidHopperMinecartEntity) accessor.getTarget()).getFluidStorage()).fabricFluidStorage
-        // );
-        return List.of();
+        return JadeFabricUtils.fromFluidStorage(
+            ((SpiritFluidStorageImpl) ((BasicFluidHopperMinecartEntity) accessor.getTarget()).getFluidStorage()).fabricFluidStorage
+        );
     }
 }

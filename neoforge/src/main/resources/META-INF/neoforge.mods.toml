@@ -1,17 +1,18 @@
 modLoader = "javafml"
 loaderVersion = "[4,)"
-#issueTrackerURL = ""
-license = "Insert License Here"
+issueTrackerURL = "https://github.com/jshipley/BasicFluidHopper/issues"
+license = "MIT"
 
 [[mods]]
 modId = "basic_fluid_hopper"
 version = "${version}"
 displayName = "Basic Fluid Hopper"
-authors = "Me!"
+displayUrl = "https://modrinth.com/mod/basic-fluid-hopper"
+authors = "jship"
 description = '''
-This is an example description! Tell everyone what your mod is about!
+A hopper that moves fluids instead of items.
 '''
-#logoFile = ""
+logoFile = "assets/basic_fluid_hopper/basic_fluid_hopper.png"
 
 [[dependencies.basic_fluid_hopper]]
 modId = "neoforge"
@@ -26,6 +27,21 @@ type = "required"
 versionRange = "[1.21,1.21.1]"
 ordering = "NONE"
 side = "BOTH"
+
+[[dependencies.blazingbamboo]]
+modId = "architectury"
+type = "required"
+versionRange = "[13.0.8,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.yacl]]
+modId = "yet_another_config_lib_v3"
+mandatory = true
+type = "required"
+versionRange = "[3.6.6,)"
+ordering = "NONE"
+side = "CLIENT"
 
 [[mixins]]
 config = "basic_fluid_hopper.mixins.json"

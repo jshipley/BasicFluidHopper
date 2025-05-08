@@ -15,7 +15,6 @@ import dev.architectury.core.item.ArchitecturyBucketItem;
 import dev.architectury.registry.registries.Registrar;
 import dev.architectury.registry.registries.RegistrarManager;
 import dev.architectury.registry.registries.RegistrySupplier;
-import eu.midnightdust.lib.config.MidnightConfig;
 import java.util.function.Supplier;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.core.registries.Registries;
@@ -190,7 +189,5 @@ public class BasicFluidHopper {
         // Copy the water bucket dispenser behavior for honey buckets
         DispenseItemBehavior dispenserBehavior = DispenserBlock.DISPENSER_REGISTRY.get(Items.WATER_BUCKET);
         HONEY_BUCKET.listen((item) -> DispenserBlock.registerBehavior(item, dispenserBehavior));
-
-        MidnightConfig.init(MOD_ID, BasicFluidHopperConfig.class);
     }
 }
