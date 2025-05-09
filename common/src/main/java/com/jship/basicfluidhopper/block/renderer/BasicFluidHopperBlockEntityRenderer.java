@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.Vec3;
 
 public class BasicFluidHopperBlockEntityRenderer implements BlockEntityRenderer<BasicFluidHopperBlockEntity> {
 
@@ -23,7 +24,7 @@ public class BasicFluidHopperBlockEntityRenderer implements BlockEntityRenderer<
     @Override
     public void render(BasicFluidHopperBlockEntity blockEntity, float partialTick,
             PoseStack poseStack,
-            MultiBufferSource buffer, int packedLight, int packedOverlay) {
+            MultiBufferSource buffer, int packedLight, int packedOverlay, Vec3 cameraPos) {
         
         Level level = blockEntity.getLevel();
         BlockPos abovePos = blockEntity.getBlockPos().above();

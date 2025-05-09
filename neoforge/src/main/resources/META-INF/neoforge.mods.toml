@@ -17,21 +17,21 @@ logoFile = "assets/basic_fluid_hopper/basic_fluid_hopper.png"
 [[dependencies.basic_fluid_hopper]]
 modId = "neoforge"
 type = "required"
-versionRange = "[21.0,)"
+versionRange = "[21.5,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.basic_fluid_hopper]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21,1.21.1]"
+versionRange = "[1.21.5,1.21.5]"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.blazingbamboo]]
 modId = "architectury"
 type = "required"
-versionRange = "[13.0.8,)"
+versionRange = "[16.1.0,)"
 ordering = "AFTER"
 side = "BOTH"
 

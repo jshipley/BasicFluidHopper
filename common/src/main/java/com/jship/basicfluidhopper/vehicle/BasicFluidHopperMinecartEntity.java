@@ -19,14 +19,17 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.AbstractMinecartContainer;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements FluidHopper, SpiritFluidStorageProvider {
+public class BasicFluidHopperMinecartEntity extends AbstractMinecartContainer implements FluidHopper, SpiritFluidStorageProvider {
 	private boolean enabled = true;
 	private int transferCooldown = -1;
 	public final SpiritFluidStorage fluidStorage;
@@ -41,24 +44,11 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 				(long) (FluidStack.bucketAmount() * BasicFluidHopperConfig.transferRate()), () -> this.markDirty());
 	}
 
-	public BasicFluidHopperMinecartEntity(EntityType<?> type, Level level, double x, double y, double z) {
-		super(type, level, x, y, z);
-
-		this.fluidStorage = SpiritFluidStorage.create(
-				BasicFluidHopperConfig.hopperCapacity() * FluidStack.bucketAmount(),
-				(long) (FluidStack.bucketAmount() * BasicFluidHopperConfig.transferRate()), () -> this.markDirty());
-	}
-
 	public static BasicFluidHopperMinecartEntity create(
 			ServerLevel level, double x, double y, double z) {
 		BasicFluidHopperMinecartEntity basicFluidHopperMinecartEntity = new BasicFluidHopperMinecartEntity(
-				BasicFluidHopper.BASIC_FLUID_HOPPER_MINECART_ENTITY.get(), level, x, y, z);
+				BasicFluidHopper.BASIC_FLUID_HOPPER_MINECART_ENTITY.get(), level);
 		return basicFluidHopperMinecartEntity;
-	}
-
-	@Override
-	public AbstractMinecart.Type getMinecartType() {
-		return AbstractMinecart.Type.HOPPER;
 	}
 
 	public SpiritFluidStorage getFluidStorage(Direction face) {
@@ -107,7 +97,7 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 
 	@Override
 	public InteractionResult interact(Player player, InteractionHand hand) {
-		return FluidHopper.useFluidItem(this.level(), player, hand, (FluidHopper) this).result();
+		return FluidHopper.useFluidItem(this.level(), player, hand, (FluidHopper) this);
 	}
 
 	public FluidStack getFluidStack() {
@@ -131,13 +121,6 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 	}
 
 	@Override
-	// Overriding destroy because for some reason getDropItem wasn't being
-	// recognized
-	protected void destroy(DamageSource source) {
-		this.destroy(this.getDropItem());
-	}
-
-	@Override
 	public ItemStack getPickResult() {
 		return new ItemStack(BasicFluidHopper.BASIC_FLUID_HOPPER_MINECART_ITEM.get());
 	}
@@ -154,9 +137,9 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 	@Override
 	protected void readAdditionalSaveData(CompoundTag nbt) {
 		super.readAdditionalSaveData(nbt);
-		this.enabled = nbt.contains("enabled") ? nbt.getBoolean("enabled") : true;
+		this.enabled = nbt.contains("enabled") ? nbt.getBoolean("enabled").orElse(true) : true;
 		fluidStorage.deserializeNbt(registryAccess(), nbt);
-		this.entityData.set(DATA_ID_FLUID, nbt.getCompound("Fluid"));
+		this.entityData.set(DATA_ID_FLUID, nbt.getCompound("Fluid").orElse(new CompoundTag()));
 	}
 
 	@Override
@@ -185,5 +168,17 @@ public class BasicFluidHopperMinecartEntity extends AbstractMinecart implements 
 	@Override
 	public SpiritFluidStorage getFluidStorage() {
 		return this.fluidStorage;
+	}
+
+	@Override
+	public int getContainerSize() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'getContainerSize'");
+	}
+
+	@Override
+	protected AbstractContainerMenu createMenu(int containerId, Inventory playerInventory) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'createMenu'");
 	}
 }

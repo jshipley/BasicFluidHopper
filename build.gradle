@@ -26,9 +26,9 @@ subprojects {
     }
 
     repositories {
-        // flatDir {
-        //     dirs 'D:/Projects/libs'
-        // }
+        flatDir {
+            dirs 'D:/Projects/libs'
+        }
 		maven {
 			name = 'ParchmentMC'
 			url = 'https://maven.parchmentmc.org'
@@ -62,7 +62,7 @@ subprojects {
         minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
         mappings loom.layered() {
             officialMojangMappings()
-            parchment("org.parchmentmc.data:parchment-1.21.1:${rootProject.parchment_version}@zip")
+            parchment("org.parchmentmc.data:parchment-1.21.5:${rootProject.parchment_version}@zip")
         }
     }
 

@@ -17,7 +17,7 @@ import snownee.jade.api.view.ViewGroup;
 import snownee.jade.util.JadeFabricUtils;
 
 public enum HopperMinecartFluidStorageProvider implements
-    IServerExtensionProvider<CompoundTag>, IClientExtensionProvider<CompoundTag, FluidView> {
+    IServerExtensionProvider<FluidView.Data>, IClientExtensionProvider<FluidView.Data, FluidView> {
     INSTANCE;
 
     public static final ResourceLocation FLUID_STORAGE = ResourceLocation.fromNamespaceAndPath(
@@ -31,12 +31,12 @@ public enum HopperMinecartFluidStorageProvider implements
     }
 
     @Override
-    public List<ClientViewGroup<FluidView>> getClientGroups(Accessor<?> accessor, List<ViewGroup<CompoundTag>> groups) {
+    public List<ClientViewGroup<FluidView>> getClientGroups(Accessor<?> accessor, List<ViewGroup<FluidView.Data>> groups) {
         return ClientViewGroup.map(groups, FluidView::readDefault, null);
     }
 
     @Override
-    public List<ViewGroup<CompoundTag>> getGroups(Accessor<?> accessor) {
+    public List<ViewGroup<FluidView.Data>> getGroups(Accessor<?> accessor) {
         return JadeFabricUtils.fromFluidStorage(
             ((SpiritFluidStorageImpl) ((BasicFluidHopperMinecartEntity) accessor.getTarget()).getFluidStorage()).fabricFluidStorage
         );

@@ -77,21 +77,21 @@ public final class BasicFluidHopperNeoforge {
     }
 
     private void initializeClient(RegisterClientExtensionsEvent event) {
-        event.registerFluidType(new IClientFluidTypeExtensions() {
-            @Override
-            public @NotNull ResourceLocation getStillTexture() {
-                return BasicFluidHopper.HONEY_FLUID_ATTRIBUTES.getSourceTexture();
-            }
+        // event.registerFluidType(new IClientFluidTypeExtensions() {
+        //     @Override
+        //     public @NotNull ResourceLocation getStillTexture() {
+        //         return BasicFluidHopper.HONEY_FLUID_ATTRIBUTES.getSourceTexture();
+        //     }
 
-            @Override
-            public @NotNull ResourceLocation getFlowingTexture() {
-                return BasicFluidHopper.HONEY_FLUID_ATTRIBUTES.getFlowingTexture();
-            }
+        //     @Override
+        //     public @NotNull ResourceLocation getFlowingTexture() {
+        //         return BasicFluidHopper.HONEY_FLUID_ATTRIBUTES.getFlowingTexture();
+        //     }
 
-            @Override
-            public @NotNull int getTintColor() {
-                return 0xCCFED167;
-            }
-        }, BasicFluidHopper.HONEY_FLUID.get().getFluidType());
+        //     @Override
+        //     public @NotNull int getTintColor() {
+        //         return 0xCCFED167;
+        //     }
+        // }, BasicFluidHopper.HONEY_FLUID.get().getFluidType());
     }
 }

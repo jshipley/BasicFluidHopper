@@ -9,14 +9,13 @@
   "stat.basic_fluid_hopper.interact_with_basic_fluid_hopper": "Interactions with Fluid Hopper",
   "config.basic_fluid_hopper.transfer_cooldown": "Transfer cooldown",
   "config.basic_fluid_hopper.transfer_cooldown.desc": "The number of ticks the hopper will wait between transfers\n\nMin: 0 ticks\nMax: 100 ticks",
-  "config.basic_fluid_hopper.transfer_cooldown.format": "%d ticks",
   "config.basic_fluid_hopper.hopper_capacity": "Hopper capacity",
   "config.basic_fluid_hopper.hopper_capacity.desc": "The number of buckets of fluid a hopper can hold\n\nMin: 0 buckets \nMax: 1000 buckets",
-  "config.basic_fluid_hopper.hopper_capacity.format": "%d buckets",
   "config.basic_fluid_hopper.transfer_rate": "Fluid transfer rate",
   "config.basic_fluid_hopper.transfer_rate.desc": "The maximum amount of fluid that can be transferred at a time\n\nMin: 0.25 buckets\nMax: 1000.0 buckets",
-  "config.basic_fluid_hopper.transfer_rate.format": "%0.2f buckets",
   "config.basic_fluid_hopper.fuel_consume_step": "Furnace fuel rate",
   "config.basic_fluid_hopper.fuel_consume_step.desc": "The amount of fluid fuel consumed at a time by a furnace\n\nMin: 0.01 buckets\nMax: 1.0 buckets",
-  "config.basic_fluid_hopper.fuel_consume_step.format": "%0.2f buckets"
+  "config.basic_fluid_hopper.int_bucket_formatter": "%d buckets",
+  "config.basic_fluid_hopper.float_bucket_formatter": "%.2f buckets",
+  "config.basic_fluid_hopper.tick_formatter": "%s ticks"
 }

@@ -13,7 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.gameevent.GameEvent;
 
-@Mixin(targets = "net/minecraft/core/dispenser/DispenseItemBehavior$14")
+@Mixin(targets = "net/minecraft/core/dispenser/DispenseItemBehavior$11")
 public abstract class DispenseGlassBottleMixin extends OptionalDispenseItemBehavior {
 
     // Replaces default action

@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "minecraft:minecart"
-    },
-    {
-      "item": "basic_fluid_hopper:basic_fluid_hopper"
-    }
+    "minecraft:minecart",
+    "basic_fluid_hopper:basic_fluid_hopper"
   ],
   "result": {
     "count": 1,

@@ -9,11 +9,12 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import dev.architectury.fluid.FluidStack;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.FuelValues;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,8 +25,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(AbstractFurnaceBlockEntity.class)
 public abstract class AbstractFurnaceMixin {
 
-    @Inject(at = @At("HEAD"), method = "getBurnDuration(Lnet/minecraft/world/item/ItemStack;)I", cancellable = true)
-    private void getFluidBurnDuration(ItemStack fuel, CallbackInfoReturnable<Integer> cir) {
+    @Inject(at = @At("HEAD"), method = "getBurnDuration(Lnet/minecraft/world/level/block/entity/FuelValues;Lnet/minecraft/world/item/ItemStack;)I", cancellable = true)
+    private void getFluidBurnDuration(FuelValues fuelValues, ItemStack fuel, CallbackInfoReturnable<Integer> cir) {
         BlockEntity blockEntity = (BlockEntity) (Object) this;
         BlockPos pos = blockEntity.getBlockPos();
 
@@ -38,15 +39,15 @@ public abstract class AbstractFurnaceMixin {
                 null);
 
         if (fluidHopper != null) {
-            cir.setReturnValue((int) (BasicFluidHopperConfig.fuelConsumeStep() * AbstractFurnaceBlockEntity.getFuel().getOrDefault(Items.LAVA_BUCKET, 20000)));
+            cir.setReturnValue((int) (BasicFluidHopperConfig.fuelConsumeStep() * fuelValues.burnDuration(new ItemStack(Items.LAVA_BUCKET))));
         }
     }
 
     // Return true if hopper is inserting fuel or original return value was true
-    @ModifyExpressionValue(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;isLit()Z", ordinal = 2), method = "serverTick(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;)V")
+    @ModifyExpressionValue(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;isLit()Z", ordinal = 2), method = "serverTick(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;)V")
     private static boolean hasFuel(
             boolean isLit,
-            @Local Level level,
+            @Local ServerLevel level,
             @Local BlockPos blockPos,
             @Local BlockState state,
             @Local AbstractFurnaceBlockEntity blockEntity) {
@@ -56,9 +57,9 @@ public abstract class AbstractFurnaceMixin {
 
     // If fluid fuel can be used then use it and set b4 (hasFuel) to false so that
     // the furnace doesn't try to use anything in the fuel slot
-    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;isLit()Z", ordinal = 4, shift = At.Shift.AFTER), method = "serverTick(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;)V")
+    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;isLit()Z", ordinal = 4, shift = At.Shift.AFTER), method = "serverTick(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;)V")
     private static void consumeFuel(
-            Level level,
+            ServerLevel level,
             BlockPos pos,
             BlockState blockState,
             AbstractFurnaceBlockEntity blockEntity,

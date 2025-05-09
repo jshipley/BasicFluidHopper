@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "redstone",
   "ingredients": [
-    {
-      "tag": "c:buckets/honey"
-    }
+    "#c:buckets/honey"
   ],
   "result": {
     "count": 1,
