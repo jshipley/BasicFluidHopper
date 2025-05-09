@@ -26,9 +26,9 @@ subprojects {
     }
 
     repositories {
-        // flatDir {
-        //     dirs 'D:/Projects/libs'
-        // }
+        flatDir {
+            dirs 'D:/Projects/libs'
+        }
 		maven {
 			name = 'ParchmentMC'
 			url = 'https://maven.parchmentmc.org'
