@@ -10,7 +10,7 @@ dependencies {
 
     modImplementation "dev.architectury:architectury:$rootProject.architectury_api_version"
 
-    modImplementation("maven.modrinth:spiritapi-fabric:$spiritapi_fabric_version_id")
+    modImplementation("com.jship.spiritapi:spiritapi-common:$spiritapi_version")
 
     modImplementation("dev.isxander:yet-another-config-lib:${yacl_version}-fabric")
 }

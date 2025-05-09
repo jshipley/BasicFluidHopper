@@ -14,7 +14,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.VehicleEntity;
@@ -77,13 +77,13 @@ public interface FluidHopper {
         return false;
     }
 
-    public static ItemInteractionResult useFluidItem(
+    public static InteractionResult useFluidItem(
             Level level,
             Player player,
             InteractionHand hand,
             FluidHopper fluidHopper) {
         if (level.isClientSide)
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
 
         ItemStack item = player.getItemInHand(hand);
         if (SpiritFluidUtil.isFluidItem(item)) {
@@ -94,29 +94,29 @@ public interface FluidHopper {
             if (playerFluid.isEmpty()) {
                 if (SpiritFluidUtil.fillItem(fluidHopper.getFluidStorage(), player, hand, true)) {
                     SpiritFluidUtil.fillItem(fluidHopper.getFluidStorage(), player, hand, false);
-                    return ItemInteractionResult.SUCCESS;
+                    return InteractionResult.SUCCESS;
                 }
                 // hopper can hold more
             } else if (storageFluid.getAmount() < fluidHopper.getFluidStorage().getTankCapacity(0)) {
                 if (SpiritFluidUtil.drainItem(fluidHopper.getFluidStorage(), player, hand, true)) {
                     SpiritFluidUtil.drainItem(fluidHopper.getFluidStorage(), player, hand, false);
-                    return ItemInteractionResult.SUCCESS;
+                    return InteractionResult.SUCCESS;
                 }
                 // hopper is full, try to drain it
                 // this will fail for buckets/bottles, but could still succeed for tanks
             } else if (storageFluid.getAmount() >= fluidHopper.getFluidStorage().getTankCapacity(0)) {
                 if (SpiritFluidUtil.fillItem(fluidHopper.getFluidStorage(), player, hand, true)) {
                     SpiritFluidUtil.fillItem(fluidHopper.getFluidStorage(), player, hand, false);
-                    return ItemInteractionResult.SUCCESS;
+                    return InteractionResult.SUCCESS;
                 }
             }
             // It is a fluid item that should interact with the hopper, but none of the
             // available actions succeeded.
-            return ItemInteractionResult.CONSUME;
+            return InteractionResult.CONSUME;
         }
 
         // Not a fluid item, let the block handle the rest
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return InteractionResult.PASS;
     }
 
     /**

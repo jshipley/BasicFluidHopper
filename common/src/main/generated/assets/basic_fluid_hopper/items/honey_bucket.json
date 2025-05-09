@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "basic_fluid_hopper:item/honey_bucket"
+  }
+}

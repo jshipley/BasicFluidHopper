@@ -5,7 +5,6 @@ import com.jship.basicfluidhopper.block.BasicFluidHopperBlock;
 import com.jship.basicfluidhopper.block.entity.BasicFluidHopperBlockEntity;
 import com.jship.basicfluidhopper.config.BasicFluidHopperConfig;
 import com.jship.basicfluidhopper.vehicle.BasicFluidHopperMinecartEntity;
-import com.jship.basicfluidhopper.vehicle.BasicFluidHopperMinecartItem;
 import com.mojang.logging.LogUtils;
 import dev.architectury.core.block.ArchitecturyLiquidBlock;
 import dev.architectury.core.fluid.ArchitecturyFlowingFluid;
@@ -15,9 +14,12 @@ import dev.architectury.core.item.ArchitecturyBucketItem;
 import dev.architectury.registry.registries.Registrar;
 import dev.architectury.registry.registries.RegistrarManager;
 import dev.architectury.registry.registries.RegistrySupplier;
+
+import java.util.Set;
 import java.util.function.Supplier;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.TagKey;
@@ -26,6 +28,7 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.MinecartItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DispenserBlock;
@@ -116,7 +119,7 @@ public class BasicFluidHopper {
         BLOCKS = MANAGER.get().get(Registries.BLOCK);
         BASIC_FLUID_HOPPER_BLOCK = BLOCKS.register(
             ResourceLocation.fromNamespaceAndPath(BasicFluidHopper.MOD_ID, "basic_fluid_hopper"),
-            () -> new BasicFluidHopperBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.HOPPER))
+            () -> new BasicFluidHopperBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.HOPPER).setId(blockKey("basic_fluid_hopper")))
         );
         HONEY_SOURCE_BLOCK = BLOCKS.register(
             ResourceLocation.fromNamespaceAndPath(BasicFluidHopper.MOD_ID, "honey"),
@@ -134,6 +137,7 @@ public class BasicFluidHopper {
                         .noLootTable()
                         .liquid()
                         .sound(SoundType.HONEY_BLOCK)
+                        .setId(blockKey("honey"))
                 )
         );
 
@@ -141,7 +145,7 @@ public class BasicFluidHopper {
         BASIC_FLUID_HOPPER_BLOCK_ENTITY = BLOCK_ENTITIES.register(
             ResourceLocation.fromNamespaceAndPath(BasicFluidHopper.MOD_ID, "basic_fluid_hopper"),
             () ->
-                BlockEntityType.Builder.of(BasicFluidHopperBlockEntity::new, BASIC_FLUID_HOPPER_BLOCK.get()).build(null)
+                new BlockEntityType<BasicFluidHopperBlockEntity>(BasicFluidHopperBlockEntity::new, Set.of(BASIC_FLUID_HOPPER_BLOCK.get()))
         );
 
         ENTITIES = MANAGER.get().get(Registries.ENTITY_TYPE);
@@ -153,7 +157,7 @@ public class BasicFluidHopper {
                     MobCategory.MISC
                 )
                     .sized(0.98F, 0.7F)
-                    .build("basic_fluid_hopper_minecart")
+                    .build(entityKey("basic_fluid_hopper_minecart"))
         );
 
         ITEMS = MANAGER.get().get(Registries.ITEM);
@@ -163,13 +167,15 @@ public class BasicFluidHopper {
                 new BlockItem(
                     BASIC_FLUID_HOPPER_BLOCK.get(),
                     new Item.Properties()//.arch$tab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
+                    .setId(itemKey("basic_fluid_hopper"))
                 )
         );
         BASIC_FLUID_HOPPER_MINECART_ITEM = ITEMS.register(
             ResourceLocation.fromNamespaceAndPath(BasicFluidHopper.MOD_ID, "basic_fluid_hopper_minecart"),
             () ->
-                new BasicFluidHopperMinecartItem(
+                new MinecartItem(BASIC_FLUID_HOPPER_MINECART_ENTITY.get(),
                     new Item.Properties().stacksTo(1)//.arch$tab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
+                    .setId(itemKey("basic_fluid_hopper_minecart"))
                 )
         );
         HONEY_BUCKET = ITEMS.register(
@@ -178,6 +184,7 @@ public class BasicFluidHopper {
                 new ArchitecturyBucketItem(
                     HONEY_FLUID,
                     new Item.Properties().craftRemainder(Items.BUCKET)//.arch$tab(CreativeModeTabs.FUNCTIONAL_BLOCKS)
+                    .setId(itemKey("honey_bucket"))
                 )
         );
     }
@@ -189,5 +196,21 @@ public class BasicFluidHopper {
         // Copy the water bucket dispenser behavior for honey buckets
         DispenseItemBehavior dispenserBehavior = DispenserBlock.DISPENSER_REGISTRY.get(Items.WATER_BUCKET);
         HONEY_BUCKET.listen((item) -> DispenserBlock.registerBehavior(item, dispenserBehavior));
+    }
+
+    public static ResourceLocation id(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+    }
+
+    public static ResourceKey<Block> blockKey(String path) {
+        return ResourceKey.create(Registries.BLOCK, id(path));
+    }
+
+    public static ResourceKey<Item> itemKey(String path) {
+        return ResourceKey.create(Registries.ITEM, id(path));
+    }
+
+    public static ResourceKey<EntityType<?>> entityKey(String path) {
+        return ResourceKey.create(Registries.ENTITY_TYPE, id(path));
     }
 }

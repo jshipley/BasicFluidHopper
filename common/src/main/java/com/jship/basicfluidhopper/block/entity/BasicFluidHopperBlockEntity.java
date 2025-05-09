@@ -39,7 +39,7 @@ public class BasicFluidHopperBlockEntity extends BlockEntity implements FluidHop
     protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         super.loadAdditional(nbt, registryLookup);
         fluidStorage.deserializeNbt(registryLookup, nbt);
-        this.transferCooldown = nbt.getInt("transfer_cooldown");
+        this.transferCooldown = nbt.getInt("transfer_cooldown").orElse(0);
     }
 
     @Override
