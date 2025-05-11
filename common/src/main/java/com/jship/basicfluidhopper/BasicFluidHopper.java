@@ -189,5 +189,11 @@ public class BasicFluidHopper {
         // Copy the water bucket dispenser behavior for honey buckets
         DispenseItemBehavior dispenserBehavior = DispenserBlock.DISPENSER_REGISTRY.get(Items.WATER_BUCKET);
         HONEY_BUCKET.listen((item) -> DispenserBlock.registerBehavior(item, dispenserBehavior));
+
+        BasicFluidHopperConfig.HANDLER.load();
+    }
+
+    public static ResourceLocation id(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 }
