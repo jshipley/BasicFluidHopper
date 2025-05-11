@@ -28,14 +28,14 @@ versionRange = "[1.21.5,1.21.5]"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.blazingbamboo]]
+[[dependencies.basic_fluid_hopper]]
 modId = "architectury"
 type = "required"
 versionRange = "[16.1.0,)"
 ordering = "AFTER"
 side = "BOTH"
 
-[[dependencies.yacl]]
+[[dependencies.basic_fluid_hopper]]
 modId = "yet_another_config_lib_v3"
 mandatory = true
 type = "required"

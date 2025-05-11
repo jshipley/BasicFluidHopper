@@ -40,7 +40,8 @@ dependencies {
 
     modImplementation "dev.architectury:architectury-neoforge:$rootProject.architectury_api_version"
 
-    include(modImplementation("com.jship.spiritapi:spiritapi-neoforge:$spiritapi_version"))
+    // include(modImplementation("maven.modrinth:spiritapi-neoforge:${spiritapi_neoforge_version_id}"))
+    include(modImplementation("com.jship.spiritapi:spiritapi-neoforge:1.0.0-1.21.1"))
 
     implementation("dev.isxander:yet-another-config-lib:${yacl_version}-neoforge") {
         exclude group: "net.neoforged.fancymodloader", module: "loader"
@@ -82,6 +83,7 @@ publishMods {
         requires("architectury-api")
         requires("yacl")
         optional("jade")
+        // embeds("spirit-api")
 
         announcementTitle = "Neoforge version on Modrinth"
     }
@@ -97,6 +99,7 @@ publishMods {
         requires("architectury-api")
         requires("yacl")
         optional("jade")
+        // embeds("spirit-api")
 
         announcementTitle = "Neoforge version on Curseforge"
     }
