@@ -23,7 +23,8 @@ public class BasicFluidHopperMinecartEntityRenderer extends MinecartRenderer<Bas
     }
 
     @Override
-    protected void renderMinecartContents(BasicFluidHopperMinecartEntity entity, float partialTicks, BlockState state, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+    protected void renderMinecartContents(BasicFluidHopperMinecartEntity entity, float partialTicks, BlockState state,
+            PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
         super.renderMinecartContents(entity, partialTicks, state, poseStack, buffer, packedLight);
 
         FluidStack fluidStack = entity.getFluidStack();
@@ -37,8 +38,15 @@ public class BasicFluidHopperMinecartEntityRenderer extends MinecartRenderer<Bas
         Level level = entity.level();
         FluidState fluidState = fluidStack.getFluid().defaultFluidState();
         int tintColor = FluidStackHooks.getColor(level, entity.getOnPos(), fluidState);
+        // If the alpha is almost 0, set it higher
+        // I'm doing this because the alpha for water was 0 on Fabric, and water was
+        // invisible
+        if ((tintColor & 0xFF000000) < 0x0F000000) {
+            tintColor |= 0xCF000000;
+        }
 
-        float height = (float) fluidStack.getAmount() / (float) entity.getFluidStorage().getTankCapacity(0)
+        float height = Math.min(1.0f,
+                fluidStack.getAmount() / (float) entity.getFluidStorage().getTankCapacity(0))
                 * (4.8f / 16f) + (11.01f / 16f);
 
         VertexConsumer builder = buffer.getBuffer(ItemBlockRenderTypes.getRenderLayer(fluidState));

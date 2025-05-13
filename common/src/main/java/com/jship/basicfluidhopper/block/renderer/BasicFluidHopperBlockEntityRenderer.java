@@ -1,11 +1,12 @@
 package com.jship.basicfluidhopper.block.renderer;
 
-import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.block.entity.BasicFluidHopperBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import dev.architectury.hooks.fluid.FluidStackHooks;
+import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -15,6 +16,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.FluidState;
 
+@Slf4j
 public class BasicFluidHopperBlockEntityRenderer implements BlockEntityRenderer<BasicFluidHopperBlockEntity> {
 
     public BasicFluidHopperBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
@@ -24,17 +26,17 @@ public class BasicFluidHopperBlockEntityRenderer implements BlockEntityRenderer<
     public void render(BasicFluidHopperBlockEntity blockEntity, float partialTick,
             PoseStack poseStack,
             MultiBufferSource buffer, int packedLight, int packedOverlay) {
-        
+
         Level level = blockEntity.getLevel();
         BlockPos abovePos = blockEntity.getBlockPos().above();
         // isRedstoneConductor should test for full, solid blocks
-        // so fluid won't render when under a block of cobblestone, but will render when under a chest or stairs
+        // so fluid won't render when under a block of cobblestone, but will render when
+        // under a chest or stairs
         if (level.getBlockState(abovePos).isRedstoneConductor(level, abovePos)) {
-                BasicFluidHopper.LOGGER.error("{} not rendering fluid", blockEntity.getBlockPos());
-                return;
-            }
+            return;
+        }
 
-        var fluidStack = blockEntity.getFluidStorage().getFluidInTank(0);
+        val fluidStack = blockEntity.getFluidStorage().getFluidInTank(0);
         if (fluidStack.isEmpty())
             return;
 
@@ -44,8 +46,15 @@ public class BasicFluidHopperBlockEntityRenderer implements BlockEntityRenderer<
 
         FluidState fluidState = fluidStack.getFluid().defaultFluidState();
         int tintColor = FluidStackHooks.getColor(level, blockEntity.getBlockPos(), fluidState);
+        // If the alpha is almost 0, set it higher
+        // I'm doing this because the alpha for water was 0 on Fabric, and water was
+        // invisible
+        if ((tintColor & 0xFF000000) < 0x0F000000) {
+            tintColor |= 0xCF000000;
+        }
 
-        float height = (float) fluidStack.getAmount() / (float) blockEntity.getFluidStorage().getTankCapacity(0)
+        float height = Math.min(1.0f,
+                fluidStack.getAmount() / (float) blockEntity.getFluidStorage().getTankCapacity(0))
                 * (4.8f / 16f) + (11.01f / 16f);
 
         VertexConsumer builder = buffer.getBuffer(ItemBlockRenderTypes.getRenderLayer(fluidState));

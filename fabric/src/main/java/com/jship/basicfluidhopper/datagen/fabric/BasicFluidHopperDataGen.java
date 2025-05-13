@@ -1,6 +1,8 @@
 package com.jship.basicfluidhopper.datagen.fabric;
 
 import com.jship.basicfluidhopper.BasicFluidHopper;
+import com.jship.basicfluidhopper.fabric.BasicFluidHopperFabric;
+
 import java.util.concurrent.CompletableFuture;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
@@ -29,7 +31,6 @@ import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Fluids;
@@ -64,6 +65,12 @@ public class BasicFluidHopperDataGen implements DataGeneratorEntrypoint {
             getOrCreateTagBuilder(BasicFluidHopper.C_VISUAL_HONEY)
                     .add(BasicFluidHopper.HONEY_FLUID.get())
                     .add(BasicFluidHopper.HONEY_FLUID_FLOWING.get());
+            getOrCreateTagBuilder(ConventionalFluidTags.MILK)                    
+                    .addOptional(BasicFluidHopperFabric.MILK_FLUID.getId())
+                    .addOptional(BasicFluidHopperFabric.MILK_FLUID_FLOWING.getId());
+            getOrCreateTagBuilder(BasicFluidHopper.C_VISUAL_MILK)
+                    .addOptional(BasicFluidHopperFabric.MILK_FLUID.getId())
+                    .addOptional(BasicFluidHopperFabric.MILK_FLUID_FLOWING.getId());
             getOrCreateTagBuilder(BasicFluidHopper.C_FLUID_FUEL).add(Fluids.LAVA);
         }
     }
@@ -207,6 +214,7 @@ public class BasicFluidHopperDataGen implements DataGeneratorEntrypoint {
             itemModelGenerator.generateFlatItem(BasicFluidHopper.BASIC_FLUID_HOPPER_ITEM.get(), ModelTemplates.FLAT_ITEM);
             itemModelGenerator.generateFlatItem(BasicFluidHopper.BASIC_FLUID_HOPPER_MINECART_ITEM.get(), ModelTemplates.FLAT_ITEM);
             itemModelGenerator.generateFlatItem(BasicFluidHopper.HONEY_BUCKET.get(), ModelTemplates.FLAT_ITEM);
+            itemModelGenerator.generateFlatItem(BasicFluidHopper.MILK_BOTTLE.get(), ModelTemplates.FLAT_ITEM);
         }
 
     }

@@ -24,6 +24,7 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 
 @Mod(BasicFluidHopper.MOD_ID)
@@ -31,6 +32,8 @@ public final class BasicFluidHopperNeoforge {
 
     public BasicFluidHopperNeoforge(IEventBus modEventBus) {
         BasicFluidHopper.init();
+
+        NeoForgeMod.enableMilkFluid();
 
         ModLoadingContext.get().registerExtensionPoint(
             IConfigScreenFactory.class,
@@ -46,7 +49,10 @@ public final class BasicFluidHopperNeoforge {
         if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
             event.accept(BasicFluidHopper.BASIC_FLUID_HOPPER_BLOCK.get());
             event.accept(BasicFluidHopper.BASIC_FLUID_HOPPER_MINECART_ITEM.get());
+        }
+        if (event.getTabKey() == CreativeModeTabs.FOOD_AND_DRINKS) {
             event.accept(BasicFluidHopper.HONEY_BUCKET.get());
+            event.accept(BasicFluidHopper.MILK_BOTTLE.get());
         }
     }
 
@@ -66,7 +72,7 @@ public final class BasicFluidHopperNeoforge {
         event.registerItem(
                 Capabilities.FluidHandler.ITEM,
                 (bottle, context) -> new BottleFluidHandler(bottle), Items.POTION, Items.HONEY_BOTTLE,
-                Items.GLASS_BOTTLE);
+                Items.GLASS_BOTTLE, BasicFluidHopper.MILK_BOTTLE.get());
     }
 
     private void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {

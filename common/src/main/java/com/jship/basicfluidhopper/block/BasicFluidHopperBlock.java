@@ -4,19 +4,42 @@ import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.block.entity.BasicFluidHopperBlockEntity;
 import com.jship.basicfluidhopper.fluid.FluidHopper;
 import com.mojang.serialization.MapCodec;
+
+import dev.architectury.fluid.FluidStack;
+import dev.architectury.injectables.annotations.ExpectPlatform;
+import dev.architectury.platform.Platform;
+import lombok.val;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.Cow;
+import net.minecraft.world.entity.animal.Pig;
+import net.minecraft.world.entity.animal.Sheep;
+import net.minecraft.world.entity.animal.horse.Donkey;
+import net.minecraft.world.entity.animal.horse.Horse;
+import net.minecraft.world.entity.animal.horse.Llama;
+import net.minecraft.world.entity.animal.horse.Mule;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biome.Precipitation;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.PointedDripstoneBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -28,6 +51,8 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.BooleanOp;
@@ -39,8 +64,7 @@ import org.jetbrains.annotations.Nullable;
 public class BasicFluidHopperBlock extends BaseEntityBlock {
 
     public static final MapCodec<BasicFluidHopperBlock> CODEC = BasicFluidHopperBlock.simpleCodec(
-        BasicFluidHopperBlock::new
-    );
+            BasicFluidHopperBlock::new);
     public static final DirectionProperty FACING = BlockStateProperties.FACING_HOPPER;
     public static final BooleanProperty ENABLED = BlockStateProperties.ENABLED;
     private static final VoxelShape TOP_SHAPE = Block.box(0.0, 10.0, 0.0, 16.0, 16.0, 16.0);
@@ -55,21 +79,17 @@ public class BasicFluidHopperBlock extends BaseEntityBlock {
     private static final VoxelShape WEST_SHAPE = Shapes.or(DEFAULT_SHAPE, Block.box(0.0, 4.0, 6.0, 4.0, 8.0, 10.0));
     private static final VoxelShape DOWN_RAYCAST_SHAPE = INSIDE_SHAPE;
     private static final VoxelShape EAST_RAYCAST_SHAPE = Shapes.or(
-        INSIDE_SHAPE,
-        Block.box(12.0, 8.0, 6.0, 16.0, 10.0, 10.0)
-    );
+            INSIDE_SHAPE,
+            Block.box(12.0, 8.0, 6.0, 16.0, 10.0, 10.0));
     private static final VoxelShape NORTH_RAYCAST_SHAPE = Shapes.or(
-        INSIDE_SHAPE,
-        Block.box(6.0, 8.0, 0.0, 10.0, 10.0, 4.0)
-    );
+            INSIDE_SHAPE,
+            Block.box(6.0, 8.0, 0.0, 10.0, 10.0, 4.0));
     private static final VoxelShape SOUTH_RAYCAST_SHAPE = Shapes.or(
-        INSIDE_SHAPE,
-        Block.box(6.0, 8.0, 12.0, 10.0, 10.0, 16.0)
-    );
+            INSIDE_SHAPE,
+            Block.box(6.0, 8.0, 12.0, 10.0, 10.0, 16.0));
     private static final VoxelShape WEST_RAYCAST_SHAPE = Shapes.or(
-        INSIDE_SHAPE,
-        Block.box(0.0, 8.0, 6.0, 4.0, 10.0, 10.0)
-    );
+            INSIDE_SHAPE,
+            Block.box(0.0, 8.0, 6.0, 4.0, 10.0, 10.0));
 
     @Override
     public MapCodec<BasicFluidHopperBlock> codec() {
@@ -79,8 +99,7 @@ public class BasicFluidHopperBlock extends BaseEntityBlock {
     public BasicFluidHopperBlock(BlockBehaviour.Properties properties) {
         super(properties);
         this.registerDefaultState(
-                this.stateDefinition.any().setValue(FACING, Direction.DOWN).setValue(ENABLED, Boolean.valueOf(true))
-            );
+                this.stateDefinition.any().setValue(FACING, Direction.DOWN).setValue(ENABLED, Boolean.valueOf(true)));
     }
 
     @Override
@@ -123,8 +142,8 @@ public class BasicFluidHopperBlock extends BaseEntityBlock {
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         Direction direction = ctx.getClickedFace().getOpposite();
         return this.defaultBlockState()
-            .setValue(FACING, direction.getAxis() == Direction.Axis.Y ? Direction.DOWN : direction)
-            .setValue(ENABLED, Boolean.valueOf(true));
+                .setValue(FACING, direction.getAxis() == Direction.Axis.Y ? Direction.DOWN : direction)
+                .setValue(ENABLED, Boolean.valueOf(true));
     }
 
     @Override
@@ -134,17 +153,15 @@ public class BasicFluidHopperBlock extends BaseEntityBlock {
 
     @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
-        Level level,
-        BlockState state,
-        BlockEntityType<T> type
-    ) {
+            Level level,
+            BlockState state,
+            BlockEntityType<T> type) {
         return level.isClientSide
-            ? null
-            : createTickerHelper(
-                type,
-                BasicFluidHopper.BASIC_FLUID_HOPPER_BLOCK_ENTITY.get(),
-                BasicFluidHopperBlockEntity::pushFluidTick
-            );
+                ? null
+                : createTickerHelper(
+                        type,
+                        BasicFluidHopper.BASIC_FLUID_HOPPER_BLOCK_ENTITY.get(),
+                        BasicFluidHopperBlockEntity::pushFluidTick);
     }
 
     @Override
@@ -156,26 +173,82 @@ public class BasicFluidHopperBlock extends BaseEntityBlock {
 
     @Override
     protected ItemInteractionResult useItemOn(
-        ItemStack item,
-        BlockState state,
-        Level level,
-        BlockPos pos,
-        Player player,
-        InteractionHand hand,
-        BlockHitResult hit
-    ) {
+            ItemStack item,
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Player player,
+            InteractionHand hand,
+            BlockHitResult hit) {
         return FluidHopper.useFluidItem(level, player, hand, (FluidHopper) level.getBlockEntity(pos));
     }
 
     @Override
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+        if (entity.getY() > pos.getY() + (4.8f / 16f)
+                && level.getBlockEntity(pos) instanceof BasicFluidHopperBlockEntity hopperEntity
+                && hopperEntity.getFluidStorage().getFluidInTank(0).getFluid().arch$holder().is(FluidTags.LAVA)) {
+                    entity.lavaHurt();
+        }
+    }
+
+    @ExpectPlatform
+    public static Fluid getMilk() {
+        throw new AssertionError();
+    }
+
+    private boolean isMilkable(Entity entity) {
+        if (!(entity instanceof Animal animal) || animal.isBaby()) return false;
+
+        if (entity instanceof Cow) return true;
+        if (Platform.isModLoaded("milkallthemobs")) {
+            // See com.natamus.collective.functions.EntityFunctions
+            return entity instanceof Sheep || entity instanceof Llama || entity instanceof Pig || entity instanceof Donkey || entity instanceof Horse || entity instanceof Mule;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void stepOn(Level level, BlockPos pos, BlockState state, Entity entity) {
+        if (isMilkable(entity) && level.getBlockEntity(pos) instanceof BasicFluidHopperBlockEntity hopperEntity) {
+            long inserted = hopperEntity.getFluidStorage().fill(FluidStack.create(getMilk(), FluidStack.bucketAmount()), true);
+            if (inserted > 0) {
+                hopperEntity.getFluidStorage().fill(FluidStack.create(getMilk(), FluidStack.bucketAmount()), false);
+                level.playSound(null, pos, SoundEvents.COW_MILK, SoundSource.NEUTRAL, 1.0f, 1.0f);
+            }
+        }
+    }
+
+    @Override
+    public void handlePrecipitation(BlockState state, Level level, BlockPos pos, Biome.Precipitation precipitation) {
+        if (precipitation == Precipitation.RAIN)
+            ((BasicFluidHopperBlockEntity) level.getBlockEntity(pos))
+                    .getFluidStorage().fill(FluidStack.create(Fluids.WATER,
+                            FluidStack.bucketAmount() / (Platform.isNeoForge() ? 100 : 81)), false);
+    }
+
+    @Override
+    protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+        val dripstonePos = PointedDripstoneBlock.findStalactiteTipAboveCauldron(level, pos);
+        if (dripstonePos == null)
+            return;
+
+        val fluid = PointedDripstoneBlock.getCauldronFillFluidType(level, dripstonePos);
+        if (fluid != Fluids.EMPTY && level.getBlockEntity(pos) instanceof BasicFluidHopperBlockEntity hopperEntity) {
+            hopperEntity.getFluidStorage()
+                    .fill(FluidStack.create(fluid, FluidStack.bucketAmount() / (Platform.isNeoForge() ? 4 : 3)), false);
+        }
+    }
+
+    @Override
     protected void neighborChanged(
-        BlockState state,
-        Level level,
-        BlockPos pos,
-        Block sourceBlock,
-        BlockPos sourcePos,
-        boolean notify
-    ) {
+            BlockState state,
+            Level level,
+            BlockPos pos,
+            Block sourceBlock,
+            BlockPos sourcePos,
+            boolean notify) {
         this.checkPoweredState(level, pos, state);
     }
 

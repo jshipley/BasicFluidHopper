@@ -7,7 +7,8 @@
     "AbstractFurnaceMixin",
     "DispenseBucketMixin",
     "DispenseGlassBottleMixin",
-    "DropperDispenseMixin"
+    "DropperDispenseMixin",
+    "PointedDripstoneBlockMixin"
   ],
   "client": [],
   "server": [],
