@@ -1,4 +1,6 @@
 // 1.21.5	-999999999-01-01T00:00:00	Basic Fluid Hopper/Tags for minecraft:fluid
 db6195d77bd598771b111d12750ba39f41fe35c7 data/c/tags/fluid/fuel.json
 0bbcf61f093eab9fc3992a803eb2b34fa04d7cbe data/c/tags/fluid/honey.json
+5bfda0d61daaf4b30f64b5e3d16c087bad161c7d data/c/tags/fluid/milk.json
 0bbcf61f093eab9fc3992a803eb2b34fa04d7cbe data/c/tags/fluid/visual/honey.json
+5bfda0d61daaf4b30f64b5e3d16c087bad161c7d data/c/tags/fluid/visual/milk.json

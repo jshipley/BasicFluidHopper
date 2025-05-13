@@ -1,5 +1,11 @@
 package com.jship.basicfluidhopper.mixin;
 
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
 import com.jship.basicfluidhopper.BasicFluidHopper;
 import com.jship.basicfluidhopper.block.entity.BasicFluidHopperBlockEntity;
 import com.jship.basicfluidhopper.config.BasicFluidHopperConfig;
@@ -7,6 +13,7 @@ import com.jship.basicfluidhopper.util.FluidHopperUtil;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
+
 import dev.architectury.fluid.FluidStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -16,11 +23,6 @@ import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.FuelValues;
 import net.minecraft.world.level.block.state.BlockState;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AbstractFurnaceBlockEntity.class)
 public abstract class AbstractFurnaceMixin {
@@ -74,7 +76,9 @@ public abstract class AbstractFurnaceMixin {
                 null);
         if (fluidHopper != null &&
                 !fluidHopper.getFluidStorage().getFluidInTank(0).isEmpty() &&
-                fluidHopper.getFluidStorage().getFluidInTank(0).getFluid().is(BasicFluidHopper.C_FLUID_FUEL)) {
+                fluidHopper.getFluidStorage().getFluidInTank(0)
+                        .getFluid().arch$holder()
+                        .is(BasicFluidHopper.C_FLUID_FUEL)) {
             long fuel_consume_step = (long) (BasicFluidHopperConfig.fuelConsumeStep() * FluidStack.bucketAmount());
             if (fluidHopper.getFluidStorage().drain(fuel_consume_step, true).getAmount() == fuel_consume_step) {
                 fluidHopper.getFluidStorage().drain(fuel_consume_step, false);

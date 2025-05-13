@@ -10,7 +10,6 @@ import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.dispenser.OptionalDispenseItemBehavior;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.gameevent.GameEvent;
 
 @Mixin(targets = "net/minecraft/core/dispenser/DispenseItemBehavior$11")
@@ -25,7 +24,7 @@ public abstract class DispenseGlassBottleMixin extends OptionalDispenseItemBehav
         if (!filledItem.isEmpty()) {
             ((OptionalDispenseItemBehavior) (Object) this).setSuccess(true);
             blockSource.level().gameEvent((Entity) null, GameEvent.FLUID_PICKUP, blockSource.pos());
-            return this.consumeWithRemainder(blockSource, itemStack, new ItemStack(Items.HONEY_BOTTLE));
+            return this.consumeWithRemainder(blockSource, itemStack, filledItem);
         } else {
             return super.execute(blockSource, itemStack);
         }

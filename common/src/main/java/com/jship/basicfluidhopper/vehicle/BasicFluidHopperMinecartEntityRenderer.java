@@ -50,8 +50,14 @@ public class BasicFluidHopperMinecartEntityRenderer extends AbstractMinecartRend
         Level level = Minecraft.getInstance().level;
         FluidState fluidState = renderState.fluidContents.getFluid().defaultFluidState();
         int tintColor = FluidStackHooks.getColor(level, BlockPos.containing(renderState.posOnRail.x, renderState.posOnRail.y, renderState.posOnRail.z), fluidState);
+        // If the alpha is almost 0, set it higher
+        // I'm doing this because the alpha for water was 0 on Fabric, and water was
+        // invisible
+        if ((tintColor & 0xFF000000) < 0x0F000000) {
+            tintColor |= 0xCF000000;
+        }
 
-        float height = (float) renderState.fluidContents.getAmount() / (float) renderState.fluidCapacity
+        float height = Math.min(1.0f, renderState.fluidContents.getAmount() / (float) renderState.fluidCapacity)
                 * (4.8f / 16f) + (11.01f / 16f);
 
         VertexConsumer builder = buffer.getBuffer(ItemBlockRenderTypes.getRenderLayer(fluidState));
