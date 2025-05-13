@@ -72,6 +72,7 @@ public abstract class FluidHopperUtil {
                 item.is(Items.GLASS_BOTTLE) &&
                 hopperFluid.getAmount() >= FluidStack.bucketAmount() / 4 &&
                 (hopperFluid.getFluid().isSame(Fluids.WATER) ||
+                    hopperFluid.getFluid().is(BasicFluidHopper.C_MILK) ||
                     hopperFluid.getFluid().is(BasicFluidHopper.C_HONEY))
             ) {
                 // Enough fluid that can go in a bottle was found in this hopper
@@ -116,7 +117,12 @@ public abstract class FluidHopperUtil {
                 fluidHopper.getFluidStorage().drain(bottleAmount, false);
                 return PotionContents.createItemStack(Items.POTION, Potions.WATER);
             } else if (
-                // TODO use honey tag
+                fluidHopper.getFluidStorage().getFluidInTank(0).getFluid().is(BasicFluidHopper.C_MILK) &&
+                fluidHopper.getFluidStorage().drain(bottleAmount, true).getAmount() == bottleAmount
+            ) {
+                fluidHopper.getFluidStorage().drain(bottleAmount, false);
+                return new ItemStack(BasicFluidHopper.MILK_BOTTLE.get());
+            } else if (
                 fluidHopper.getFluidStorage().getFluidInTank(0).getFluid().is(BasicFluidHopper.C_HONEY) &&
                 fluidHopper.getFluidStorage().drain(bottleAmount, true).getAmount() == bottleAmount
             ) {

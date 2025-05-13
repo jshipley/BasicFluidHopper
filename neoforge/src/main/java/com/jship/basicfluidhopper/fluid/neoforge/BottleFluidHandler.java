@@ -18,8 +18,8 @@ public class BottleFluidHandler implements IFluidHandlerItem {
     protected ItemStack container;
     protected final ItemStack emptyContainer = new ItemStack(Items.GLASS_BOTTLE);
     protected final ItemStack waterContainer = PotionContents.createItemStack(Items.POTION, Potions.WATER);
+    protected final ItemStack milkContainer = new ItemStack(BasicFluidHopper.MILK_BOTTLE.get());
     protected final ItemStack honeyContainer = new ItemStack(Items.HONEY_BOTTLE);
-    // protected final 
     protected final int capacity = 250;
 
     public BottleFluidHandler(ItemStack container) {
@@ -35,6 +35,8 @@ public class BottleFluidHandler implements IFluidHandlerItem {
     public FluidStack getFluidInTank(int tank) {
         if (container.is(Items.POTION) && container.get(DataComponents.POTION_CONTENTS).is(Potions.WATER)) {
             return new FluidStack(Fluids.WATER, capacity);
+        } else if (container.is(BasicFluidHopper.MILK_BOTTLE.get())) {
+            return new FluidStack(NeoForgeMod.MILK.value(), capacity);
         } else if (container.is(Items.HONEY_BOTTLE)) {
             return new FluidStack(BasicFluidHopper.HONEY_FLUID.get(), capacity);
         } else {
@@ -49,7 +51,8 @@ public class BottleFluidHandler implements IFluidHandlerItem {
 
     @Override
     public boolean isFluidValid(int tank, FluidStack stack) {
-        return stack.getAmount() >= capacity && (stack.is(NeoForgeMod.WATER_TYPE.value()) || stack.is(Tags.Fluids.HONEY));
+        return stack.getAmount() >= capacity && (stack.is(NeoForgeMod.WATER_TYPE.value())
+                || stack.is(NeoForgeMod.MILK_TYPE.value()) || stack.is(Tags.Fluids.HONEY));
     }
 
     @Override
@@ -61,6 +64,8 @@ public class BottleFluidHandler implements IFluidHandlerItem {
         if (action.execute()) {
             if (resource.is(NeoForgeMod.WATER_TYPE.value())) {
                 container = waterContainer.copy();
+            } else if (resource.is(NeoForgeMod.MILK_TYPE.value())) {
+                container = milkContainer.copy();
             } else if (resource.is(Tags.Fluids.HONEY)) {
                 container = honeyContainer.copy();
             } else {
@@ -80,6 +85,8 @@ public class BottleFluidHandler implements IFluidHandlerItem {
 
         if (getFluidInTank(0).is(NeoForgeMod.WATER_TYPE.value()) && resource.is(NeoForgeMod.WATER_TYPE.value())) {
             return drain(capacity, action);
+        } else if (getFluidInTank(0).is(NeoForgeMod.MILK_TYPE.value()) && resource.is(NeoForgeMod.MILK_TYPE.value())) {
+            return drain(capacity, action);
         } else if (getFluidInTank(0).is(Tags.Fluids.HONEY) && resource.is(Tags.Fluids.HONEY)) {
             return drain(capacity, action);
         }
@@ -97,6 +104,8 @@ public class BottleFluidHandler implements IFluidHandlerItem {
 
         if (getFluidInTank(0).is(NeoForgeMod.WATER_TYPE.value())) {
             drained = new FluidStack(Fluids.WATER, capacity);
+        } else if (getFluidInTank(0).is(NeoForgeMod.MILK_TYPE.value())) {
+            drained = new FluidStack(NeoForgeMod.MILK.value(), capacity);
         } else if (getFluidInTank(0).is(Tags.Fluids.HONEY)) {
             drained = new FluidStack(BasicFluidHopper.HONEY_FLUID.get(), capacity);
         } else {
@@ -107,7 +116,7 @@ public class BottleFluidHandler implements IFluidHandlerItem {
             container = emptyContainer.copy();
         }
 
-        return drained;        
+        return drained;
     }
 
     @Override

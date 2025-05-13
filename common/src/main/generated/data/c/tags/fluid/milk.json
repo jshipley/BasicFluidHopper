@@ -1,0 +1,12 @@
+{
+  "values": [
+    {
+      "id": "basic_fluid_hopper:milk",
+      "required": false
+    },
+    {
+      "id": "basic_fluid_hopper:flowing_milk",
+      "required": false
+    }
+  ]
+}

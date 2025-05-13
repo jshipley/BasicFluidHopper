@@ -110,7 +110,6 @@ public class BasicFluidHopperBlockEntity extends BlockEntity implements FluidHop
     @Override
     public void markDirty() {
         this.setChanged();
-        // if (!level.isClientSide()) level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
     }
 
     /**
