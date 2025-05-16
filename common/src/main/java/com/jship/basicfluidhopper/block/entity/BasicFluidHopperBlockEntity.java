@@ -6,6 +6,7 @@ import com.jship.basicfluidhopper.config.BasicFluidHopperConfig;
 import com.jship.basicfluidhopper.fluid.FluidHopper;
 import com.jship.spiritapi.api.fluid.SpiritFluidStorage;
 import dev.architectury.fluid.FluidStack;
+import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -13,14 +14,19 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 
 public class BasicFluidHopperBlockEntity extends BlockEntity implements FluidHopper {
 
     public final SpiritFluidStorage fluidStorage;
     private int transferCooldown = -1;
+    private int milkingCooldown = -1;
 
     public BasicFluidHopperBlockEntity(BlockPos pos, BlockState state) {
         super(BasicFluidHopper.BASIC_FLUID_HOPPER_BLOCK_ENTITY.get(), pos, state);
@@ -89,11 +95,30 @@ public class BasicFluidHopperBlockEntity extends BlockEntity implements FluidHop
         BlockState state,
         BasicFluidHopperBlockEntity blockEntity
     ) {
+        if (blockEntity.milkingCooldown > 0) {
+            --blockEntity.milkingCooldown;
+        }
         if (blockEntity.transferCooldown > 0) {
             --blockEntity.transferCooldown;
         }
         if (!blockEntity.needsCooldown()) {
             FluidHopper.fillAndDrain(level, pos, state, (FluidHopper) blockEntity);
+        }
+    }
+
+    @ExpectPlatform
+    public static Fluid getMilk() {
+        throw new AssertionError();
+    }
+
+    public void milkEntity(Level level, BlockPos pos) {
+        if (milkingCooldown > 0) return;
+
+        long inserted = fluidStorage.fill(FluidStack.create(getMilk(), FluidStack.bucketAmount()), true);
+        if (inserted > 0) {
+            milkingCooldown = level.getRandom().nextIntBetweenInclusive(20, 40);
+            fluidStorage.fill(FluidStack.create(getMilk(), FluidStack.bucketAmount()), false);
+            level.playSound(null, pos, SoundEvents.COW_MILK, SoundSource.NEUTRAL, 1.0f, 1.0f);
         }
     }
 

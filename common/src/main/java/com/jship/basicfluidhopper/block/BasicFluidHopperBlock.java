@@ -192,11 +192,6 @@ public class BasicFluidHopperBlock extends BaseEntityBlock {
         }
     }
 
-    @ExpectPlatform
-    public static Fluid getMilk() {
-        throw new AssertionError();
-    }
-
     private boolean isMilkable(Entity entity) {
         if (!(entity instanceof Animal animal) || animal.isBaby()) return false;
 
@@ -212,11 +207,7 @@ public class BasicFluidHopperBlock extends BaseEntityBlock {
     @Override
     public void stepOn(Level level, BlockPos pos, BlockState state, Entity entity) {
         if (isMilkable(entity) && level.getBlockEntity(pos) instanceof BasicFluidHopperBlockEntity hopperEntity) {
-            long inserted = hopperEntity.getFluidStorage().fill(FluidStack.create(getMilk(), FluidStack.bucketAmount()), true);
-            if (inserted > 0) {
-                hopperEntity.getFluidStorage().fill(FluidStack.create(getMilk(), FluidStack.bucketAmount()), false);
-                level.playSound(null, pos, SoundEvents.COW_MILK, SoundSource.NEUTRAL, 1.0f, 1.0f);
-            }
+            hopperEntity.milkEntity(level, pos);
         }
     }
 
